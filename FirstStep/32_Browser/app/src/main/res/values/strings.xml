@@ -1,0 +1,5 @@
+<resources>
+    <string name="app_name">32_Browser</string>
+    <string name="web_go">WEB GO</string>
+    <string name="enter_web_adress">enter web adress</string>
+</resources>

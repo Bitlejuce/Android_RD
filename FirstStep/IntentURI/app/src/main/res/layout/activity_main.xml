@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="utf-8"?>
+<android.support.constraint.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context="rdproject.intenturi.MainActivity">
+
+    <TableRow
+        android:id="@+id/raw"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:gravity="center_horizontal"
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintRight_toRightOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        tools:layout_constraintLeft_creator="1"
+        tools:layout_constraintRight_creator="1"
+        tools:layout_constraintTop_creator="1"
+        >
+
+        <Button
+            android:id="@+id/web"
+            style="@style/Base.Widget.AppCompat.ImageButton"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:text="@string/web"
+            tools:layout_editor_absoluteX="0dp"
+            tools:layout_editor_absoluteY="0dp" />
+
+        <Button
+            android:id="@+id/map"
+            style="@style/Base.Widget.AppCompat.ImageButton"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:text="@string/map"
+            tools:layout_editor_absoluteX="67dp"
+            tools:layout_editor_absoluteY="-2dp" />
+
+        <Button
+            android:id="@+id/call"
+            style="@style/Base.Widget.AppCompat.ImageButton"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:text="@string/call"
+            tools:layout_editor_absoluteX="170dp"
+            tools:layout_editor_absoluteY="16dp" />
+    </TableRow>
+
+</android.support.constraint.ConstraintLayout>

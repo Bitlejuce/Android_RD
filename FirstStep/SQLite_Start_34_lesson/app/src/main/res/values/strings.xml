@@ -1,0 +1,11 @@
+<resources>
+    <string name="app_name">34_SQLite_Start</string>
+    <string name="email">E-mail</string>
+    <string name="name">Name</string>
+    <string name="add">ADD</string>
+    <string name="clear">CLEAR</string>
+    <string name="read">READ</string>
+    <string name="id1">ID</string>
+    <string name="delete">delete</string>
+    <string name="update">update</string>
+</resources>

@@ -1,0 +1,18 @@
+<resources>
+    <string name="app_name">My Application</string>
+    <string name="centreText">Тупо текст по центру</string>
+    <string name="textview2">Фигасе</string>
+    <string name="title_activity_main2">Main2Activity</string>
+    <string name="button3">Button3</string>
+    <string name="button1">Button1</string>
+    <string name="button2">Button2</string>
+    <string name="button1_pres">Pressed key 1! </string>
+    <string name="button2_pres">Pressed key 2! </string>
+    <string name="button3_pres">Pressed key 3! </string>
+    <string name="text_pres">Кнопки, такие кнопки.. </string>
+    <string name="change_image">Change Image</string>
+    <string name="click_me">Click me!</string>
+    <string name="why_you_re_calling_me">Why you\'re calling me?</string>
+    <string name="i_m_great_panda">I\'m Great Panda!</string>
+
+</resources>

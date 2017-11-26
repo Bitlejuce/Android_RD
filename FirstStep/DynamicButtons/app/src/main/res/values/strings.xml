@@ -1,0 +1,9 @@
+<resources>
+    <string name="app_name">DynamicButtons</string>
+    <string name="center">Center</string>
+    <string name="left">Left</string>
+    <string name="right">Right</string>
+    <string name="name_of_button">Name of Button</string>
+    <string name="delete">Delete</string>
+    <string name="create">Create</string>
+</resources>

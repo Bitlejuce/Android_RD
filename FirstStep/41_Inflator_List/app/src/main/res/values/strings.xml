@@ -1,0 +1,5 @@
+<resources>
+    <string name="app_name">41_Inflator_List</string>
+    <string name="this_is_the_list">This is the List!</string>
+    <string name="textview">TextView</string>
+</resources>

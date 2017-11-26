@@ -1,0 +1,374 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@drawable/gradient_background"
+    tools:context="rdproject.calculator.MainActivity">
+
+
+    <TableLayout
+        android:id="@+id/buton_table"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_alignParentBottom="true"
+        android:layout_centerHorizontal="true"
+        android:gravity="bottom"
+        android:stretchColumns="*">
+
+
+        <TableRow
+            android:id="@+id/c_mc_mr"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:gravity="center">
+
+            <Button
+                android:id="@+id/c"
+                style="@android:style/Widget.Holo.Button.Inset"
+                android:layout_width="60dp"
+                android:layout_height="60dp"
+                android:layout_margin="5dp"
+                android:background="@drawable/rounded_button"
+                android:lines="2"
+                android:paddingStart="15dp"
+                android:paddingEnd="0dp"
+                android:gravity="start|center_vertical|bottom"
+                android:soundEffectsEnabled="true"
+                android:text="@string/c"
+                android:textSize="26sp"
+                />
+
+            <Button
+                android:id="@+id/m_plus"
+                style="@android:style/Widget.Holo.Button.Inset"
+                android:layout_width="60dp"
+                android:layout_height="60dp"
+                android:layout_margin="5dp"
+                android:background="@drawable/rounded_button"
+                android:soundEffectsEnabled="true"
+                android:text="@string/m"
+                android:textSize="30sp" />
+
+            <Button
+                android:id="@+id/m_r"
+                style="@android:style/Widget.Holo.Button.Inset"
+                android:layout_width="60dp"
+                android:layout_height="60dp"
+                android:layout_margin="5dp"
+                android:background="@drawable/rounded_button"
+                android:soundEffectsEnabled="true"
+                android:text="@string/mr"
+                android:textAppearance="@style/TextAppearance.AppCompat.Notification.Title.Media"
+                android:textSize="30sp" />
+
+            <Button
+                android:id="@+id/m_minus"
+                style="@android:style/Widget.Holo.Button.Inset"
+                android:layout_width="60dp"
+                android:layout_height="60dp"
+                android:layout_margin="5dp"
+                android:background="@drawable/rounded_button"
+                android:soundEffectsEnabled="true"
+                android:text="@string/m_"
+                android:textSize="30sp" />
+
+            <Button
+                android:id="@+id/stepback"
+                style="@android:style/Widget.Holo.Button.Inset"
+                android:layout_width="60dp"
+                android:layout_height="60dp"
+                android:layout_margin="5dp"
+                android:background="@drawable/rounded_button"
+                android:drawableEnd="@drawable/ic_backspace_white_42"
+                android:paddingStart="0dp"
+                android:paddingEnd="10dp"
+                android:soundEffectsEnabled="true"
+                android:textSize="30sp" />
+        </TableRow>
+
+        <TableRow
+            android:id="@+id/t789"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent">
+
+            <Button
+                android:id="@+id/button7"
+                style="@android:style/Widget.Holo.Button.Inset"
+                android:layout_width="60dp"
+                android:layout_height="60dp"
+                android:layout_margin="5dp"
+                android:background="@drawable/rounded_button"
+                android:soundEffectsEnabled="true"
+                android:text="@string/_7"
+                android:textSize="30sp" />
+
+            <Button
+                android:id="@+id/button8"
+                style="@android:style/Widget.Holo.Button.Inset"
+                android:layout_width="60dp"
+                android:layout_height="60dp"
+                android:layout_margin="5dp"
+                android:background="@drawable/rounded_button"
+                android:soundEffectsEnabled="true"
+                android:text="@string/_8"
+                android:textSize="30sp" />
+
+            <Button
+                android:id="@+id/button9"
+                style="@android:style/Widget.Holo.Button.Inset"
+                android:layout_width="60dp"
+                android:layout_height="60dp"
+                android:layout_margin="5dp"
+                android:background="@drawable/rounded_button"
+                android:soundEffectsEnabled="true"
+                android:text="@string/_9"
+                android:textSize="30sp" />
+
+            <Button
+                android:id="@+id/devide"
+                style="@android:style/Widget.Holo.Button.Inset"
+                android:layout_width="60dp"
+                android:layout_height="60dp"
+                android:layout_margin="5dp"
+                android:background="@drawable/rounded_button"
+                android:soundEffectsEnabled="true"
+                android:text="@string/divide"
+                android:textSize="30sp" />
+
+            <Button
+                android:id="@+id/plus_minus"
+                style="@android:style/Widget.Holo.Button.Inset"
+                android:layout_width="60dp"
+                android:layout_height="60dp"
+                android:layout_margin="5dp"
+                android:background="@drawable/rounded_button"
+                android:soundEffectsEnabled="true"
+                android:text="@string/plus_minus"
+                android:textColor="@android:color/background_light"
+                android:textSize="30sp" />
+        </TableRow>
+
+        <TableRow
+            android:id="@+id/t456"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent">
+
+            <Button
+                android:id="@+id/button4"
+                style="@android:style/Widget.Holo.Button.Inset"
+                android:layout_width="60dp"
+                android:layout_height="60dp"
+                android:layout_margin="5dp"
+                android:background="@drawable/rounded_button"
+                android:soundEffectsEnabled="true"
+                android:text="@string/_4"
+                android:textSize="30sp" />
+
+            <Button
+                android:id="@+id/button5"
+                style="@android:style/Widget.Holo.Button.Inset"
+                android:layout_width="60dp"
+                android:layout_height="60dp"
+                android:layout_margin="5dp"
+                android:background="@drawable/rounded_button"
+                android:soundEffectsEnabled="true"
+                android:text="@string/_5"
+                android:textSize="30sp" />
+
+            <Button
+                android:id="@+id/button6"
+                style="@android:style/Widget.Holo.Button.Inset"
+                android:layout_width="60dp"
+                android:layout_height="60dp"
+                android:layout_margin="5dp"
+                android:background="@drawable/rounded_button"
+                android:soundEffectsEnabled="true"
+                android:text="@string/_6"
+                android:textSize="30sp" />
+
+            <Button
+                android:id="@+id/produce"
+                style="@android:style/Widget.Holo.Button.Inset"
+                android:layout_width="60dp"
+                android:layout_height="60dp"
+                android:layout_margin="5dp"
+                android:background="@drawable/rounded_button"
+                android:soundEffectsEnabled="true"
+                android:text="@string/multiply"
+                android:textSize="30sp" />
+
+            <Button
+                android:id="@+id/x2"
+                style="@android:style/Widget.Holo.Button.Inset"
+                android:layout_width="60dp"
+                android:layout_height="60dp"
+                android:layout_margin="5dp"
+                android:background="@drawable/rounded_button"
+                android:soundEffectsEnabled="true"
+                android:text="@string/square"
+                android:textSize="30sp" />
+
+        </TableRow>
+
+        <TableRow
+            android:id="@+id/t123"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent">
+
+            <Button
+                android:id="@+id/button1"
+                style="@android:style/Widget.Holo.Button.Inset"
+                android:layout_width="60dp"
+                android:layout_height="60dp"
+                android:layout_margin="5dp"
+                android:background="@drawable/rounded_button"
+                android:soundEffectsEnabled="true"
+                android:text="@string/_1"
+                android:textSize="30sp" />
+
+            <Button
+                android:id="@+id/button2"
+                style="@android:style/Widget.Holo.Button.Inset"
+                android:layout_width="60dp"
+                android:layout_height="60dp"
+                android:layout_margin="5dp"
+                android:background="@drawable/rounded_button"
+                android:soundEffectsEnabled="true"
+                android:text="@string/_2"
+                android:textSize="30sp" />
+
+            <Button
+                android:id="@+id/button3"
+                style="@android:style/Widget.Holo.Button.Inset"
+                android:layout_width="60dp"
+                android:layout_height="60dp"
+                android:layout_margin="5dp"
+                android:background="@drawable/rounded_button"
+                android:soundEffectsEnabled="true"
+                android:text="@string/_3"
+                android:textSize="30sp" />
+
+            <Button
+                android:id="@+id/minus"
+                style="@android:style/Widget.Holo.Button.Inset"
+                android:layout_width="60dp"
+                android:layout_height="60dp"
+                android:layout_margin="5dp"
+                android:background="@drawable/rounded_button"
+                android:soundEffectsEnabled="true"
+                android:text="@string/minus"
+                android:textSize="30sp" />
+
+            <Button
+                android:id="@+id/sqrt"
+                style="@android:style/Widget.Holo.Button.Inset"
+                android:layout_width="60dp"
+                android:layout_height="60dp"
+                android:layout_margin="5dp"
+                android:background="@drawable/rounded_button"
+                android:soundEffectsEnabled="true"
+                android:text="@string/sqr_root"
+                android:textSize="30sp" />
+
+        </TableRow>
+
+        <TableRow
+            android:id="@+id/zero_point_percent"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent">
+
+            <Button
+                android:id="@+id/button0"
+                style="@android:style/Widget.Holo.Button.Inset"
+                android:layout_width="60dp"
+                android:layout_height="60dp"
+                android:layout_margin="5dp"
+                android:background="@drawable/rounded_button"
+                android:soundEffectsEnabled="true"
+                android:text="@string/_0"
+                android:textSize="30sp" />
+
+            <Button
+                android:id="@+id/button_point"
+                style="@android:style/Widget.Holo.Button.Inset"
+                android:layout_width="60dp"
+                android:layout_height="60dp"
+                android:layout_margin="5dp"
+                android:background="@drawable/rounded_button"
+                android:soundEffectsEnabled="true"
+                android:text="@string/point"
+                android:textSize="30sp" />
+
+            <Button
+                android:id="@+id/button_percent"
+                style="@android:style/Widget.Holo.Button.Inset"
+                android:layout_width="60dp"
+                android:layout_height="60dp"
+                android:layout_margin="5dp"
+                android:background="@drawable/rounded_button"
+                android:soundEffectsEnabled="true"
+                android:text="@string/percent"
+                android:textSize="30sp" />
+
+            <Button
+                android:id="@+id/plus"
+                style="@android:style/Widget.Holo.Button.Inset"
+                android:layout_width="60dp"
+                android:layout_height="60dp"
+                android:layout_margin="5dp"
+                android:background="@drawable/rounded_button"
+                android:soundEffectsEnabled="true"
+                android:text="@string/plus"
+                android:textSize="30sp" />
+
+            <Button
+                android:id="@+id/calculate"
+                style="@android:style/Widget.Holo.Button.Inset"
+                android:layout_width="60dp"
+                android:layout_height="60dp"
+                android:layout_margin="5dp"
+                android:background="@drawable/rounded_button"
+                android:soundEffectsEnabled="true"
+                android:text="@string/ravno"
+                android:textSize="30sp" />
+
+        </TableRow>
+
+    </TableLayout>
+
+    <TextView
+        android:id="@+id/textView"
+        android:textIsSelectable ="true"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_above="@id/buton_table"
+        android:layout_alignParentTop="true"
+        android:layout_marginBottom="5dp"
+        android:layout_marginLeft="5dp"
+        android:layout_marginRight="5dp"
+        android:background="@drawable/rounded_text_viev"
+        android:clickable="true"
+        android:gravity="bottom"
+        android:hint="@string/hello_i_m_your_calc"
+        android:textAlignment="center"
+        android:textColor="@color/white_color"
+        android:textSize="36sp"
+        android:inputType="none"
+        android:textStyle="italic"
+        android:maxLines="2000"
+        android:scrollbars = "vertical"/>
+
+    <TextView
+        android:id="@+id/memoryView"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="8dp"
+        android:layout_marginTop="8dp"
+        android:hint="@string/memBox"
+        android:textColor="@color/white_color"
+        android:layout_alignParentTop="true"
+        android:layout_alignStart="@+id/textView" />
+
+</RelativeLayout>

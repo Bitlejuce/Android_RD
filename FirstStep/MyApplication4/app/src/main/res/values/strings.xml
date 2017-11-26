@@ -1,0 +1,12 @@
+<resources>
+    <string name="app_name">My Application</string>
+    <string name="action_settings">Settings</string>
+    <string name="calc">Calc</string>
+    <string name="hi_buddy">Hi buddy!</string>
+    <string name="info">Info</string>
+    <string name="title_activity_info">Info</string>
+    <string name="information_page">Information page</string>
+    <string name="checkboxInfo">CheckBox</string>
+    <string name="hi_or_what_s_up">Hi or What\'s up?</string>
+    <string name="whats_up_buddy">What\'s up buddy!</string>
+</resources>

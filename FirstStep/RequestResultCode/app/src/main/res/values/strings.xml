@@ -1,0 +1,11 @@
+<resources>
+    <string name="app_name">RequestResultCode</string>
+    <string name="alignment">ALIGNMENT</string>
+    <string name="color">COLOR</string>
+    <string name="green">Green</string>
+    <string name="blue">Blue</string>
+    <string name="red">Red</string>
+    <string name="center">center</string>
+    <string name="left">left</string>
+    <string name="right">right</string>
+</resources>

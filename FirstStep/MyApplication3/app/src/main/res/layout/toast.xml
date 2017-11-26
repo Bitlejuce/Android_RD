@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content"
+    android:layout_marginTop="@dimen/fab_margin"
+    android:background="@color/common_google_signin_btn_text_light_disabled"
+    android:clickable="false"
+    android:gravity="bottom"
+    android:orientation="vertical">
+
+    <TextView
+        android:id="@+id/toastText"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="@string/i_m_great_panda"
+        android:textAlignment="center"
+        android:textSize="25sp"
+        android:textStyle="bold"
+        android:textColor="@color/textColorPanda"/>
+
+    <TextView
+        android:id="@+id/toastText1"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="@string/why_you_re_calling_me"
+        android:textAlignment="center"
+        android:textSize="25sp"
+        android:textStyle="bold"
+        android:textColor="@color/textColorPanda"/>
+
+    <ImageView
+        android:id="@+id/imageView"
+        android:layout_width="280dp"
+        android:layout_height="280dp"
+        android:adjustViewBounds="false"
+        android:contentDescription=""
+        app:srcCompat="@drawable/panda1"
+        tools:ignore="ContentDescription" />
+</LinearLayout>

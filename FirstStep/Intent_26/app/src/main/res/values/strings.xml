@@ -1,0 +1,8 @@
+<resources>
+    <string name="app_name">Intent_26</string>
+    <string name="time">Time</string>
+    <string name="date">Date</string>
+    <string name="time_text">Time Text</string>
+    <string name="date_text">Date Text</string>
+    <string name="fake_activyty_running">Fake Activyty Running</string>
+</resources>
