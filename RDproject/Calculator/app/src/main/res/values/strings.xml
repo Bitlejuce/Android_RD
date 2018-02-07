@@ -1,6 +1,6 @@
 <resources>
     <string name="app_name">Calculator</string>
-    <string name="hello_i_m_your_calc">Version 1.1</string>
+    <string name="Ver">Version 1.3</string>
     <string name="sqr_root">\u221a</string>
     <string name="square">x\u00B2</string>
     <string name="divide">\u00F7</string>
@@ -26,4 +26,5 @@
     <string name="m_">M-</string>
     <string name="mr">MR</string>
     <string name="memBox">Memory is empty</string>
+    <string name="exitApp">Click again to exit</string>
 </resources>

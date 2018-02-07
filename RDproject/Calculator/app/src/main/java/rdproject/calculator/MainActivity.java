@@ -23,15 +23,18 @@ public class MainActivity extends AppCompatActivity {
     private static TextView memory;
     private Button clear, mPlus, mMinus, mRecall, backSpace, one, two, three, four, five, six, seven, eight,
             nine, zero, point, percent, divide, multiply, minus, plus, plusMinus, x2, sqrt, ravno;
+    private Toast toast;
+    private static NumberFormatter formatter = NumberFormatter.getFormatter();
 
     private List<Button> buttonList;
-    ButtonListener listener = ButtonListener.getInstance();
+    private ButtonListener listener = ButtonListener.getInstance();
     public static TextView getMainWindow() {
         return mainWindow;
     }
     public static TextView getMemoryViev() {
         return memory;
     }
+    private static long back_pressed;
 
     @Override
 
@@ -52,6 +55,7 @@ public class MainActivity extends AppCompatActivity {
             button.setOnClickListener(listener);
         }
         clear.setOnLongClickListener(listener);
+        listener.setContext(this);             //experiment
     }
 
     private void createAllButtons() {
@@ -89,8 +93,27 @@ public class MainActivity extends AppCompatActivity {
         return Arrays.asList(buttons);
     }
 
-    public void showToast(Context context, String text) {
-        Toast.makeText(context, text, Toast.LENGTH_LONG).show();
+    public void showToast(String text) {
+
+        toast = Toast.makeText(this, text, Toast.LENGTH_SHORT);
+        toast.show();
+    }
+
+    @Override
+    public void onBackPressed() {
+        if (back_pressed + 2000 > System.currentTimeMillis()) {
+            super.onBackPressed();
+            return;
+        } else {
+            showToast(getString(R.string.exitApp));
+        }
+        back_pressed = System.currentTimeMillis();
+    }
+
+    @Override
+    protected void onStop () {
+        if (toast != null) toast.cancel();
+        super.onStop();
     }
 
     public static class ModelViev{
@@ -110,6 +133,7 @@ public class MainActivity extends AppCompatActivity {
         public void clearView() {
             mainWindow.setTextAlignment(View.TEXT_ALIGNMENT_CENTER);
             mainWindow.setText("");
+            mainWindow.setHint("");
             isReadyToNum2 = false;
             currentNumber1 = null;
             currentNumber2 = null;
@@ -121,6 +145,7 @@ public class MainActivity extends AppCompatActivity {
 
         public void stepBack() {
             if (isOperationActive()) return;
+            if (justResulted) return;
             try {
                 String text = mainWindow.getText().toString();
                 if (!text.endsWith("\n")) {
@@ -128,6 +153,9 @@ public class MainActivity extends AppCompatActivity {
                 }
                 mainWindow.setText(text);
             } catch (Exception e) {
+            }
+            if (mainWindow.getText().toString().equals("")){
+                clearView();
             }
         }
 
@@ -148,6 +176,7 @@ public class MainActivity extends AppCompatActivity {
         }
 
         public void reNewView(String s) {
+            if (s == null || s.equals("")) return;
             String text = mainWindow.getText().toString();
             if (text.substring(text.lastIndexOf("\n") + 1).contains(".") && s.equals(".")) return;
             if (justResulted && !isReadyToNum2) {
@@ -204,10 +233,13 @@ public class MainActivity extends AppCompatActivity {
                 isReadyToNum2 = true;
                 return;
             }
-            if (!isReadyToNum2) {
+            if (!isReadyToNum2) {         // main part of initializing operation
                 currentOperation = s;
                 currentNumber1 = mainWindow.getText().toString();
                 currentNumber1 = currentNumber1.substring(currentNumber1.lastIndexOf("\n") + 1); //getting last string of view
+                Log.d("Debugging", "currentNumber1 just captured = " + currentNumber1);
+                currentNumber1 = formatter.normalizeNumber(currentNumber1);  // here we get the number from text view in normal mode
+                Log.d("Debugging", "currentNumber1 normalized = " + currentNumber1);
                 if (justResulted) {
                     reNewView(s);
                 } else {
@@ -224,12 +256,19 @@ public class MainActivity extends AppCompatActivity {
                 justResulted = false;
                 currentOperation = lastOperation;
                 String result = "";
+                String formattedResult = "";
                 try {
+                    Log.d("Debugging", "currentNumber1 inconing to produceResult = " + currentNumber1);
+                    currentNumber1 = formatter.normalizeNumber(currentNumber1);  // here we get the number from text view in normal mode before calculating ????????????
+                    Log.d("Debugging", "currentNumber1 normalized in produceResult = " + currentNumber1);
                     result = calcHelper.calculate(currentNumber1, currentNumber2, currentOperation);
+                    Log.d("Debugging", "result in produceResult = " + currentNumber1);
+                    formattedResult = formatter.formatNumber(result);  // testing............................................................
+                    Log.d("Debugging", "formattedResult in produceResult = " + currentNumber1);
                 } catch (Exception e) { }
                 currentOperation = null;
                 currentNumber1 = result;
-                reNewView("\n" + "=" + "\n" + result);
+                reNewView("\n" + "=" + "\n" + formattedResult);
                 isReadyToNum2 = false;
                 justResulted = true;
                 return;
@@ -239,14 +278,23 @@ public class MainActivity extends AppCompatActivity {
 
             currentNumber2 = mainWindow.getText().toString();
             currentNumber2 = currentNumber2.substring(currentNumber2.lastIndexOf("\n") + 1); //getting last string of view
+            Log.d("Debugging", "currentNumber2 getting = " + currentNumber2);
+            currentNumber2 = formatter.normalizeNumber(currentNumber2);       // testing.......................................................................
+            Log.d("Debugging", "currentNumber2 normalized = " + currentNumber2);
             String result = "";
+            String formattedResult = "";
             try {
+                Log.d("Debugging", "2 block, currentNumber1 inconing to produceResult = " + currentNumber1);
+                currentNumber1 = formatter.normalizeNumber(currentNumber1);  // here we get the number from text view in normal mode before calculating  ?????????????????
+                Log.d("Debugging", "2 block, currentNumber1 normalized in produceResult = " + currentNumber1);
                 result = calcHelper.calculate(currentNumber1, currentNumber2, currentOperation);
+                formattedResult = formatter.formatNumber(result);  // testing............................................................
+                Log.d("Debugging", "2 block, formattedResult in produceResult = " + currentNumber1);
             } catch (Exception e) {}
             lastOperation = currentOperation;
             currentOperation = null;
             currentNumber1 = result;
-            reNewView("\n" + "=" + "\n" + result);
+            reNewView("\n" + "=" + "\n" + formattedResult);
             isReadyToNum2 = false;
             justResulted = true;
         }

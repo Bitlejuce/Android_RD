@@ -17,6 +17,10 @@ public class Memory {
         return memory;
     }
 
+    public String getMem() {
+        return mem;
+    }
+
     private String mem = null;
     private TextView mainWindow = MainActivity.getMainWindow();
     private MainActivity.ModelViev modelViev = ButtonListener.getModelViev();
@@ -79,6 +83,7 @@ public class Memory {
             text = text.substring(text.lastIndexOf("\n") + 1); //getting last string of view
         }
         Log.d("Debugging", "Captured text = " + text );
+        //text = NumberFormatter.getFormatter().normalizeNumber(text);
         return text;
     }
 }

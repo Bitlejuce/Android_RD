@@ -21,9 +21,16 @@ public class ButtonListener implements View.OnClickListener, View.OnLongClickLis
     }
     public static Memory m;
 
+    private MainActivity context;
+
+    public void setContext(MainActivity context) {
+        this.context = context;
+    }
+
     @Override
     public void onClick(View v) {
         modelViev.setAlignmentEnd();
+        context.getMainWindow().setHint("");
         m = Memory.getInstance();
         switch (v.getId()) {
             case (R.id.c):
@@ -108,7 +115,12 @@ public class ButtonListener implements View.OnClickListener, View.OnLongClickLis
     @Override
     public boolean onLongClick(View v) {
         m = Memory.getInstance();
-        m.memoryClear();
+        if (m.getMem() != null) {
+            m.memoryClear();
+            context.showToast("Memory successfully cleared");
+            return true;
+        }
+        context.showToast("Memory is empty");
         return true;
     }
 }
