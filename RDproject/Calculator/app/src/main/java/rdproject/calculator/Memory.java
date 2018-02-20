@@ -1,13 +1,7 @@
 package rdproject.calculator;
 
-import android.content.Context;
 import android.util.Log;
 import android.widget.TextView;
-import android.widget.Toast;
-
-/**
- * Created by Ro on 14.09.2017.
- */
 
 public class Memory {
     private Memory() {
@@ -25,6 +19,7 @@ public class Memory {
     private TextView mainWindow = MainActivity.getMainWindow();
     private MainActivity.ModelViev modelViev = ButtonListener.getModelViev();
     private TextView memoryViev = MainActivity.getMemoryViev();
+    private static NumberFormatter formatter = NumberFormatter.getFormatter();
 
 
     public void plus() {
@@ -55,17 +50,12 @@ public class Memory {
                 return;
             }
             modelViev.reNewView(mem);
-            // mem = null;
         } catch (Exception e) {
         }
     }
     public void memoryClear() {
         memoryViev.setText("");
         mem = null;
-    }
-
-    public void showToast(Context context, String text) {
-        Toast.makeText(context, text, Toast.LENGTH_LONG).show();
     }
 
     public String GettingLastStringOfView() {
@@ -76,14 +66,13 @@ public class Memory {
         } catch (Exception e) {
         }
         if (text.equals("") || text.endsWith("\n") || modelViev.isOperationActive()) {
-            // new Memory().showToast(MainActivity.this);
             return "0";
         }
         if (text.contains("\n")) {
             text = text.substring(text.lastIndexOf("\n") + 1); //getting last string of view
         }
         Log.d("Debugging", "Captured text = " + text );
-        //text = NumberFormatter.getFormatter().normalizeNumber(text);
+        text = formatter.formatNumber(text);
         return text;
     }
 }

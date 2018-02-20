@@ -2,10 +2,6 @@ package rdproject.calculator;
 
 import java.math.BigDecimal;
 
-/**
- * Created by Ro on 16.08.2017.
- */
-
 public class CalcHelper {
     private Calc calc = Calc.getCalc();
 

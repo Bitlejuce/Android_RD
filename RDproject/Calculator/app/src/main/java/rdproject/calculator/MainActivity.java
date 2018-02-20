@@ -1,11 +1,7 @@
 package rdproject.calculator;
 
-import android.app.Activity;
-import android.content.Context;
-import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
-import android.text.Html;
-import android.text.TextUtils;
+import android.support.v7.app.AppCompatActivity;
 import android.text.method.ScrollingMovementMethod;
 import android.util.Log;
 import android.view.View;
@@ -13,7 +9,6 @@ import android.widget.Button;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
@@ -260,11 +255,11 @@ public class MainActivity extends AppCompatActivity {
                 try {
                     Log.d("Debugging", "currentNumber1 inconing to produceResult = " + currentNumber1);
                     currentNumber1 = formatter.normalizeNumber(currentNumber1);  // here we get the number from text view in normal mode before calculating ????????????
-                    Log.d("Debugging", "currentNumber1 normalized in produceResult = " + currentNumber1);
+                    Log.d("Debugging", "currentNumber1 normalized in produceResult = " + currentNumber1);  // may be we don't need to normalize number here
                     result = calcHelper.calculate(currentNumber1, currentNumber2, currentOperation);
-                    Log.d("Debugging", "result in produceResult = " + currentNumber1);
+                    Log.d("Debugging", "result in produceResult = " + result);
                     formattedResult = formatter.formatNumber(result);  // testing............................................................
-                    Log.d("Debugging", "formattedResult in produceResult = " + currentNumber1);
+                    Log.d("Debugging", "formattedResult in produceResult = " + formattedResult);
                 } catch (Exception e) { }
                 currentOperation = null;
                 currentNumber1 = result;
@@ -288,8 +283,9 @@ public class MainActivity extends AppCompatActivity {
                 currentNumber1 = formatter.normalizeNumber(currentNumber1);  // here we get the number from text view in normal mode before calculating  ?????????????????
                 Log.d("Debugging", "2 block, currentNumber1 normalized in produceResult = " + currentNumber1);
                 result = calcHelper.calculate(currentNumber1, currentNumber2, currentOperation);
+                Log.d("Debugging", "2 block, result in produceResult = " + result);
                 formattedResult = formatter.formatNumber(result);  // testing............................................................
-                Log.d("Debugging", "2 block, formattedResult in produceResult = " + currentNumber1);
+                Log.d("Debugging", "2 block, formattedResult in produceResult = " + formattedResult);
             } catch (Exception e) {}
             lastOperation = currentOperation;
             currentOperation = null;
@@ -322,7 +318,6 @@ public class MainActivity extends AppCompatActivity {
                         //MainActivity.showToast(this, "Opa-4ike");
                     }
                     break;
-
             }
             reNewView(text);
             // isReadyToNum2 = false;
@@ -358,7 +353,7 @@ public class MainActivity extends AppCompatActivity {
             text = startText + text;
             mainWindow.setText(text);
         }
-// it does work
+// it does work (but need to be tested with Engineering numbers)
 
         public void plusMinus() {
             if (isOperationActive() || mainWindow.getText().toString().equals("")) return;
