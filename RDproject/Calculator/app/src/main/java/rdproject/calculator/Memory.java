@@ -23,20 +23,20 @@ public class Memory {
 
 
     public void plus() {
-        mem = mem == null ? "0" : mem;
+        mem = mem == null ? "0" : formatter.normalizeNumber(mem);
         Log.d("Debugging", "M = " + mem + "   GettingLastStringOfView = " + GettingLastStringOfView());
             CalcHelper calcHelper = new CalcHelper();
             mem = calcHelper.calculate(mem, GettingLastStringOfView(), "+");
         Log.d("Debugging", "Calculated M = " + mem );
-        memoryViev.setText(mem);
+        memoryViev.setText(formatter.formatNumber(mem));
     }
 
     public void minus() {
-        mem = mem == null ? "0" : mem;
+        mem = mem == null ? "0" : formatter.normalizeNumber(mem);
         CalcHelper calcHelper = new CalcHelper();
         mem = calcHelper.calculate(mem, GettingLastStringOfView(), "-");
         Log.d("Debugging", "M = " + mem );
-        memoryViev.setText(mem);
+        memoryViev.setText(formatter.formatNumber(mem));
     }
 
     public void recall() {
@@ -72,7 +72,7 @@ public class Memory {
             text = text.substring(text.lastIndexOf("\n") + 1); //getting last string of view
         }
         Log.d("Debugging", "Captured text = " + text );
-        text = formatter.formatNumber(text);
+        //text = formatter.formatNumber(text);
         return text;
     }
 }

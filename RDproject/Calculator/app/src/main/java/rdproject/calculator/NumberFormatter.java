@@ -6,7 +6,7 @@ import java.text.DecimalFormatSymbols;
 import java.text.ParseException;
 
 public class NumberFormatter {
-    private static NumberFormatter formatter = new NumberFormatter(12);
+    private static NumberFormatter formatter = new NumberFormatter(15);
 
     public static NumberFormatter getFormatter() {
         return formatter;
