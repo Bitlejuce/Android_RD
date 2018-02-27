@@ -72,7 +72,7 @@ public class Memory {
             text = text.substring(text.lastIndexOf("\n") + 1); //getting last string of view
         }
         Log.d("Debugging", "Captured text = " + text );
-        //text = formatter.formatNumber(text);
+        text = formatter.normalizeNumber(text);
         return text;
     }
 }
