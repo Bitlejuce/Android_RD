@@ -29,7 +29,7 @@ import com.shoppinglist.rdproject.shoppinglist.adapters.RVAdapterToDo;
 import java.util.List;
 
 public class MainScreen extends AppCompatActivity
-        implements NavigationView.OnNavigationItemSelectedListener {
+        implements NavigationView.OnNavigationItemSelectedListener, AddDialog.OnTextInputListener {
     private RecyclerView rViewToDo;
     private RecyclerView rViewDone;
     private RVAdapterToDo rAdapterToDo;
@@ -54,12 +54,8 @@ public class MainScreen extends AppCompatActivity
         fab.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-               // AddDialog.getDialog(MainScreen.this).show();
-                final EditText inputText;
-                DialogFragment dialog =  new AddDialog();
-                dialog.show(getFragmentManager(), "AddDialog");
-                //inputText = dialog.getDialog().findViewById(R.id.enter_text);
-                //inputText.setText("bbbblaaaaa");
+                //DialogFragment dialogFragment = new AddDialog();
+                new AddDialog().show(getFragmentManager(), "AddDialog");
 
             }
         });
@@ -94,7 +90,11 @@ public class MainScreen extends AppCompatActivity
         rAdapterDone = new RVAdapterToDo(doneList, R.id.list_done);
         rViewDone.setAdapter(rAdapterDone);
     }
-
+    @Override  // here we receive users input in Dialog and add it to shopping list
+    public void getUserInput(String input) {
+        shoppingList.add(0, new Product(input, "later", R.drawable.ic_menu_camera));  /// temporary implementation!!!
+        rAdapterToDo.notifyDataSetChanged();
+    }
     @Override
     public void onBackPressed() {
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
@@ -152,4 +152,6 @@ public class MainScreen extends AppCompatActivity
         drawer.closeDrawer(GravityCompat.START);
         return true;
     }
+
+
 }
