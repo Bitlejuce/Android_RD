@@ -4,11 +4,13 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context="rdproject.a48_simpleadapter.MainActivity">
+    tools:context="rdproject.a48_45_simpleadapter_development.MainActivity">
 
     <ListView
-        android:id="@+id/lvSimple"
+        android:id="@+id/listView"
         android:layout_width="match_parent"
-        android:layout_height="match_parent"></ListView>
+        android:layout_height="wrap_content">
+
+    </ListView>
 
 </android.support.constraint.ConstraintLayout>
