@@ -5,4 +5,6 @@
     <color name="colorAccent">#374387</color>
     <color name="cardBackground">#e6dcdf</color>
     <color name="dialogBackground">#FFFFBB33</color>
+    <color name="itemImageColour">#9FE554</color>
+
 </resources>

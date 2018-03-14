@@ -1,5 +1,8 @@
 package com.shoppinglist.rdproject.shoppinglist.adapters;
 
+import android.content.Context;
+import android.graphics.Color;
+import android.graphics.drawable.Drawable;
 import android.support.design.widget.Snackbar;
 import android.support.v7.widget.CardView;
 import android.support.v7.widget.RecyclerView;
@@ -18,45 +21,39 @@ import java.util.List;
 public class RVAdapterToDo extends RecyclerView.Adapter<RVAdapterToDo.ProductViewHolder>{
 
     private List<Product> product;
-      int layoutId;
+    private int layoutId;
+    private Context context;
     public List<Product> getProductList() {
         return product;
     }
 
-    public RVAdapterToDo(List<Product> product, int layoutId){
+    public RVAdapterToDo(Context context, List<Product> product, int layoutId){
         this.product = product;
         this.layoutId = layoutId;
+        this.context = context;
     }
     @Override
     public ProductViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
-        View v = null;
+        CardView v = (CardView)LayoutInflater.from(parent.getContext()).inflate(R.layout.item, parent, false);
+
         switch (layoutId) {
             case R.id.lis_to_do: {
-                 v = LayoutInflater.from(parent.getContext()).inflate(R.layout.item, parent, false);
+                 v.setCardBackgroundColor(context.getResources().getColor(R.color.cardBackground));
                  return new ProductViewHolder(v);
             }
             case R.id.list_done: {
-                 v = LayoutInflater.from(parent.getContext()).inflate(R.layout.item_done, parent, false);
+                v.setBackgroundColor(context.getResources().getColor(R.color.cardview_dark_background));
             }
         }
             return new ProductViewHolder(v);
     }
     @Override
     public void onBindViewHolder(ProductViewHolder holder, int i) {
-        switch (layoutId) {
-            case R.id.lis_to_do: {
-                holder.productName.setText(product.get(i).getName());
+                String name = product.get(i).getName();
+                holder.productName.setText(name);
                 holder.productQty.setText(product.get(i).getQuantity());
-                holder.productPhoto.setImageResource(product.get(i).getPhotoId());
-                return;
-            }
-            case R.id.list_done: {
-                holder.productName.setText(product.get(i).getName());
-                holder.productQty.setText(product.get(i).getQuantity());
-                holder.productPhoto.setImageResource(product.get(i).getPhotoId());
-            }
+                holder.productPhoto.setText(name.substring(0,1).toUpperCase());
         }
-    }
 
     @Override
     public int getItemCount() {
@@ -67,13 +64,13 @@ public class RVAdapterToDo extends RecyclerView.Adapter<RVAdapterToDo.ProductVie
         CardView cv;
         TextView productName;
         TextView productQty;
-        ImageView productPhoto;
+        TextView productPhoto;
         ProductViewHolder(View itemView) {
             super(itemView);
             cv = (CardView)itemView; //(CardView)itemView.findViewById(R.id.item);
             productName = (TextView)itemView.findViewById(R.id.product_name);
             productQty = (TextView)itemView.findViewById(R.id.quantity);
-            productPhoto = (ImageView)itemView.findViewById(R.id.pic_of_the_product);
+            productPhoto = (TextView)itemView.findViewById(R.id.pic_of_the_product);
             itemView.setOnClickListener(this);
         }
 

@@ -8,10 +8,14 @@ import android.os.Bundle;
 import android.support.v7.app.AlertDialog;
 import android.view.LayoutInflater;
 import android.view.View;
+import android.view.WindowManager;
+import android.widget.Button;
 import android.widget.EditText;
+import android.widget.Toast;
 
-public class AddDialog extends DialogFragment implements DialogInterface.OnClickListener{
-    private EditText input;
+public class AddDialog extends DialogFragment {
+    private EditText input, qty;
+    private Button add, cancel;
     public OnTextInputListener onTextInputListener;
 
     @Override
@@ -19,42 +23,48 @@ public class AddDialog extends DialogFragment implements DialogInterface.OnClick
         AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
         LayoutInflater inflater = getActivity().getLayoutInflater();
         View dialogView = inflater.inflate(R.layout.add_product, null);
+        qty = dialogView.findViewById(R.id.enter_quantity);
         input = dialogView.findViewById(R.id.enter_text);
-        input.requestFocus();
-        builder.setView(dialogView).
-                setPositiveButton(R.string.add, this).
-                setNegativeButton(R.string.cancel, this);
+        add = dialogView.findViewById(R.id.addButton);
+        cancel = dialogView.findViewById(R.id.cancelButton);
 
-        return builder.create();
-    }
-
-    @Override
-    public void onClick(DialogInterface dialogInterface, int i) {
-
-        if (i == -1) {
-            String inputString = input.getText().toString();
-            if (!inputString.equals("")) {
-                onTextInputListener.getUserInput(inputString);
+        add.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                String inputString = input.getText().toString();
+                String inputQty = qty.getText().toString();
+                if (!inputString.equals("")) {
+                    onTextInputListener.getUserInput(inputString, inputQty);
+                    getDialog().dismiss();
+                } else {
+                    getDialog().dismiss();
+                }
+            }
+        });
+        cancel.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
                 getDialog().dismiss();
             }
-        }else {
-            getDialog().dismiss();
-        }
+        });
+        builder.setView(dialogView);
+        Dialog dialog = builder.create();
+        dialog.getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_VISIBLE);
+
+        return dialog;
     }
 
     @Override
     public void onAttach(Context context) {
         super.onAttach(context);
         try {
-            onTextInputListener = (MainScreen)context;
+            onTextInputListener = (OnTextInputListener)getActivity();
         } catch (Exception e) {
             e.printStackTrace();
         }
     }
 
     public interface OnTextInputListener{
-        void getUserInput(String input);
+        void getUserInput(String input, String qty);
     }
 }
-
-

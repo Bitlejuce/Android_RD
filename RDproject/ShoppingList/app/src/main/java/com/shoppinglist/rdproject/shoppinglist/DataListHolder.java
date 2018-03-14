@@ -23,16 +23,16 @@ public class DataListHolder {
         doneList = new ArrayList<>();
         shoppingList = new ArrayList<>();
 
-        shoppingList.add(new Product("Vodka", "5", R.drawable.ic_menu_camera));
-        shoppingList.add(new Product("Meat", "2", R.drawable.ic_menu_camera));
-        shoppingList.add(new Product("Cheese", "0,5", R.drawable.ic_menu_camera));
-        shoppingList.add(new Product("Salo", "2", R.drawable.ic_menu_camera));
-        shoppingList.add(new Product("Bread", "2", R.drawable.ic_menu_camera));
-        shoppingList.add(new Product("Onion", "3", R.drawable.ic_menu_camera));
-        shoppingList.add(new Product("Garlic", "1", R.drawable.ic_menu_camera));
-        shoppingList.add(new Product("Fish", "2", R.drawable.ic_menu_camera));
-        shoppingList.add(new Product("Cola", "1,5", R.drawable.ic_menu_camera));
+        shoppingList.add(new Product("Vodka", "5"));
+        shoppingList.add(new Product("Meat", "2"));
+        shoppingList.add(new Product("Cheese", "0,5"));
+        shoppingList.add(new Product("Salo", "2"));
+        shoppingList.add(new Product("Bread", "2"));
+        shoppingList.add(new Product("Onion", "3"));
+        shoppingList.add(new Product("Garlic", "1"));
+        shoppingList.add(new Product("Fish", "2"));
+        shoppingList.add(new Product("Cola", "1,5"));
 
-        doneList.add(new Product("Salmon", "4,5", R.drawable.ic_menu_camera));
+        doneList.add(new Product("Salmon", "4,5"));
     }
 }
