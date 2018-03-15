@@ -12,6 +12,7 @@
     <string name="add">Add</string>
     <string name="cancel">Cancel</string>
     <string name="clear_done">Clear done</string>
+    <string name="clear_all">Clear list</string>
     <string name="enter_the_name_of_product">WHAT WOULD YOU LIKE?</string>
     <string name="enter_product_name">Enter product name</string>
     <string name="enter_quantity">Enter quantity</string>

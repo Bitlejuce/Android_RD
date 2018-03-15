@@ -12,6 +12,8 @@ import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import com.shoppinglist.rdproject.shoppinglist.DBHelper;
+import com.shoppinglist.rdproject.shoppinglist.DataListHolder;
 import com.shoppinglist.rdproject.shoppinglist.Product;
 import com.shoppinglist.rdproject.shoppinglist.R;
 
@@ -23,6 +25,7 @@ public class RVAdapterToDo extends RecyclerView.Adapter<RVAdapterToDo.ProductVie
     private List<Product> product;
     private int layoutId;
     private Context context;
+    private DataListHolder dataListHolder;
     public List<Product> getProductList() {
         return product;
     }
@@ -31,6 +34,7 @@ public class RVAdapterToDo extends RecyclerView.Adapter<RVAdapterToDo.ProductVie
         this.product = product;
         this.layoutId = layoutId;
         this.context = context;
+        dataListHolder = new DataListHolder(context);
     }
     @Override
     public ProductViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
@@ -42,7 +46,7 @@ public class RVAdapterToDo extends RecyclerView.Adapter<RVAdapterToDo.ProductVie
                  return new ProductViewHolder(v);
             }
             case R.id.list_done: {
-                v.setBackgroundColor(context.getResources().getColor(R.color.cardview_dark_background));
+                v.setCardBackgroundColor(context.getResources().getColor(R.color.cardview_dark_background));
             }
         }
             return new ProductViewHolder(v);
@@ -94,6 +98,11 @@ public class RVAdapterToDo extends RecyclerView.Adapter<RVAdapterToDo.ProductVie
                 RVAdapterToDo adapterTo = (RVAdapterToDo) listTo.getAdapter();
 
                 product = adapterFrom.getProductList().get(position);
+                if (product.getStatus() == DBHelper.STATUS_TODO) {
+                    product.setStatus(DBHelper.STATUS_DONE);
+                }else {
+                    product.setStatus(DBHelper.STATUS_TODO);
+                }
                 List<Product> listWhereAddProduct = adapterTo.getProductList();
                 List<Product> listWhereRemoveProduct = adapterFrom.getProductList();
 
@@ -103,8 +112,12 @@ public class RVAdapterToDo extends RecyclerView.Adapter<RVAdapterToDo.ProductVie
                     listWhereRemoveProduct.remove(position);
                     adapterFrom.notifyDataSetChanged();
 
+
+                dataListHolder.update(product);
+
+
                 if (layoutId == R.id.lis_to_do) {
-                    Snackbar.make(view, "You just deleted " + (position + 1), Snackbar.LENGTH_LONG)
+                    Snackbar.make(view, "Well done, you just got  " + (product.getName() + "!"), Snackbar.LENGTH_LONG)
                             .setAction("Action", null).show();
                 }
 

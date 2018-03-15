@@ -32,8 +32,6 @@ public class MainScreen extends AppCompatActivity
     private List<Product> doneList;
 
 
-
-
     @Override
     protected void onCreate(final Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -62,7 +60,7 @@ public class MainScreen extends AppCompatActivity
         // start code
 
 
-        dataListHolder = new DataListHolder();
+        dataListHolder = new DataListHolder(MainScreen.this);
         shoppingList = dataListHolder.getShoppingList();
         doneList = dataListHolder.getDoneList();
 
@@ -82,8 +80,10 @@ public class MainScreen extends AppCompatActivity
     }
     @Override  // here we receive users input in Dialog and add it to shopping list
     public void getUserInput(String input, String quantity) {
-        shoppingList.add(0, new Product(input, quantity));
+        Product product = new Product(input, quantity, 0);
+        shoppingList.add(0, product);
         rAdapterToDo.notifyDataSetChanged();
+        dataListHolder.insert(product);
     }
     @Override
     public void onBackPressed() {
@@ -93,6 +93,12 @@ public class MainScreen extends AppCompatActivity
         } else {
             super.onBackPressed();
         }
+    }
+
+    @Override
+    protected void onDestroy() {
+        dataListHolder.close();
+        super.onDestroy();
     }
 
     @Override
@@ -107,12 +113,22 @@ public class MainScreen extends AppCompatActivity
         // Handle action bar item clicks here. The action bar will
         // automatically handle clicks on the Home/Up button, so long
         // as you specify a parent activity in AndroidManifest.xml.
-        int id = item.getItemId();
-
-        //noinspection SimplifiableIfStatement
-        if (id == R.id.share) {
-            Toast.makeText(this, "Cannot share yet", Toast.LENGTH_SHORT).show();
-            return true;
+        switch (item.getItemId()) {
+            case R.id.share:
+                Toast.makeText(this, "Cannot share yet", Toast.LENGTH_SHORT).show();
+                return true;
+            case R.id.clear_all:
+                shoppingList.clear();
+                doneList.clear();
+                rAdapterToDo.notifyDataSetChanged();
+                rAdapterDone.notifyDataSetChanged();
+                dataListHolder.deleteAll();
+                return true;
+            case R.id.clear_done:
+                doneList.clear();
+                rAdapterDone.notifyDataSetChanged();
+                dataListHolder.deleteDone();
+                return true;
         }
 
         return super.onOptionsItemSelected(item);
