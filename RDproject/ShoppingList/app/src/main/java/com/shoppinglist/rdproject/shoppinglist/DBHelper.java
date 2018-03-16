@@ -15,7 +15,7 @@ public class DBHelper extends SQLiteOpenHelper {
     public static final String COLUMN_STATUS = "STATUS";
     public static final int STATUS_TODO = 0;
     public static final int STATUS_DONE = 1;
-    public static final String TABLE_NAME = "Newlist";
+    public String tableName = "Newlist";
   //  public static final DBHelper dbHelper;
 
     public DBHelper(Context context) {
@@ -24,7 +24,7 @@ public class DBHelper extends SQLiteOpenHelper {
 
     @Override
     public void onCreate(SQLiteDatabase db) {
-        String query = "CREATE TABLE " + TABLE_NAME + " (" +
+        String query = "CREATE TABLE " + tableName + " (" +
                 COLUMN_ID + " INTEGER PRIMARY KEY AUTOINCREMENT, " +
                 COLUMN_NAME + " TEXT, " +
                 COLUMN_QUANTITY + " TEXT, " +
@@ -35,7 +35,7 @@ public class DBHelper extends SQLiteOpenHelper {
     @Override
     public void onUpgrade(SQLiteDatabase db, int i, int i1) {
 
-        db.execSQL("DROP TABLE IF EXISTS " + TABLE_NAME);
+        db.execSQL("DROP TABLE IF EXISTS " + tableName);
         onCreate(db);
     }
 }

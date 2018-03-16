@@ -17,10 +17,13 @@ public class DataListHolder {
     private List<String> listTables;
     private Context context;
     private SQLiteDatabase shoppingListDB;
+    private String tableName;
 
-    public DataListHolder(Context context) {
+    public DataListHolder(Context context, String tableName) {
         this.context = context;
+        this.tableName = tableName;
         DBHelper dbHelper = new DBHelper(context);
+        dbHelper.tableName = tableName;
         shoppingListDB = dbHelper.getWritableDatabase();
     }
 
@@ -29,28 +32,28 @@ public class DataListHolder {
         cv.put(DBHelper.COLUMN_NAME, product.getName());
         cv.put(DBHelper.COLUMN_QUANTITY, product.getQuantity());
         cv.put(DBHelper.COLUMN_STATUS, DBHelper.STATUS_TODO);
-        return shoppingListDB.insert(DBHelper.TABLE_NAME, null, cv);
+        return shoppingListDB.insert(tableName, null, cv);
     }
     public int update(Product product) {
         ContentValues cv = new ContentValues();
         cv.put(DBHelper.COLUMN_NAME, product.getName());
         cv.put(DBHelper.COLUMN_QUANTITY, product.getQuantity());
         cv.put(DBHelper.COLUMN_STATUS, product.getStatus());
-        return shoppingListDB.update(DBHelper.TABLE_NAME, cv, DBHelper.COLUMN_NAME + " = ?", new String[] {String.valueOf(product.getName()) });
+        return shoppingListDB.update(tableName, cv, DBHelper.COLUMN_NAME + " = ?", new String[] {String.valueOf(product.getName()) });
     }
     public int deleteAll() {
-        return shoppingListDB.delete(DBHelper.TABLE_NAME, null, null);
+        return shoppingListDB.delete(tableName, null, null);
     }
      public void delete(Product product) {
-        shoppingListDB.delete(DBHelper.TABLE_NAME, DBHelper.COLUMN_NAME + " = ?", new String[] { String.valueOf(product.getName()) });
+        shoppingListDB.delete(tableName, DBHelper.COLUMN_NAME + " = ?", new String[] { String.valueOf(product.getName()) });
     }
     public void deleteDone() {
         for (Product p: getDoneList()) {
-            shoppingListDB.delete(DBHelper.TABLE_NAME, DBHelper.COLUMN_NAME + " = ?", new String[] { String.valueOf(p.getName()) });
+            shoppingListDB.delete(tableName, DBHelper.COLUMN_NAME + " = ?", new String[] { String.valueOf(p.getName()) });
         }
     }
     public ArrayList<Product> selectAll() {
-        Cursor mCursor = shoppingListDB.rawQuery("SELECT * FROM " + DBHelper.TABLE_NAME, null);
+        Cursor mCursor = shoppingListDB.rawQuery("SELECT * FROM " + tableName, null);
         ArrayList<Product> arr = new ArrayList<>();
         mCursor.moveToFirst();
         if (!mCursor.isAfterLast()) {

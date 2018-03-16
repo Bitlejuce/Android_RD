@@ -1,5 +1,7 @@
 package com.shoppinglist.rdproject.shoppinglist;
 
+import android.content.Context;
+import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.NavigationView;
@@ -21,6 +23,9 @@ import java.util.List;
 
 public class MainScreen extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener, AddDialog.OnTextInputListener {
+    public static final String APP_PREFERENCES = "listsettings";
+    public static final String APP_PREFERENCES_LIST_NAME = "listname";
+    private SharedPreferences mSettings;
     private RecyclerView rViewToDo;
     private RecyclerView rViewDone;
     private RVAdapterToDo rAdapterToDo;
@@ -30,6 +35,7 @@ public class MainScreen extends AppCompatActivity
     private DataListHolder dataListHolder;
     private List<Product> shoppingList;
     private List<Product> doneList;
+    private String listName;
 
 
     @Override
@@ -58,26 +64,28 @@ public class MainScreen extends AppCompatActivity
         navigationView.setNavigationItemSelectedListener(this);
         // end of template
         // start code
-
-
-        dataListHolder = new DataListHolder(MainScreen.this);
+        mSettings = getSharedPreferences(APP_PREFERENCES, Context.MODE_PRIVATE);
+        loadPreferences();
+        setTitle(listName);
+        dataListHolder = new DataListHolder(MainScreen.this, listName);
         shoppingList = dataListHolder.getShoppingList();
         doneList = dataListHolder.getDoneList();
 
-        rViewToDo = (RecyclerView)findViewById(R.id.lis_to_do);
+        rViewToDo = (RecyclerView) findViewById(R.id.lis_to_do);
         rViewToDo.setHasFixedSize(true);
         rLayoutManagerDo = new LinearLayoutManager(this);
         rViewToDo.setLayoutManager(rLayoutManagerDo);
-        rAdapterToDo = new RVAdapterToDo(this, shoppingList, R.id.lis_to_do);
+        rAdapterToDo = new RVAdapterToDo(this, shoppingList, R.id.lis_to_do, listName);
         rViewToDo.setAdapter(rAdapterToDo);
 
-        rViewDone = (RecyclerView)findViewById(R.id.list_done);
+        rViewDone = (RecyclerView) findViewById(R.id.list_done);
         rViewDone.setHasFixedSize(true);
         rLayoutManagerDone = new LinearLayoutManager(this);
         rViewDone.setLayoutManager(rLayoutManagerDone);
-        rAdapterDone = new RVAdapterToDo(this, doneList, R.id.list_done);
+        rAdapterDone = new RVAdapterToDo(this, doneList, R.id.list_done, listName);
         rViewDone.setAdapter(rAdapterDone);
     }
+
     @Override  // here we receive users input in Dialog and add it to shopping list
     public void getUserInput(String input, String quantity) {
         Product product = new Product(input, quantity, 0);
@@ -85,6 +93,7 @@ public class MainScreen extends AppCompatActivity
         rAdapterToDo.notifyDataSetChanged();
         dataListHolder.insert(product);
     }
+
     @Override
     public void onBackPressed() {
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
@@ -93,12 +102,6 @@ public class MainScreen extends AppCompatActivity
         } else {
             super.onBackPressed();
         }
-    }
-
-    @Override
-    protected void onDestroy() {
-        dataListHolder.close();
-        super.onDestroy();
     }
 
     @Override
@@ -160,5 +163,39 @@ public class MainScreen extends AppCompatActivity
         return true;
     }
 
+    @Override
+    protected void onPause() {  // need more tests
+        super.onPause();
+        // Remember data
+       savePreferences();
+    }
 
+  /*  @Override
+    protected void onResume() {
+        super.onResume();
+            // Getting listname from preferences
+            loadPreferences();
+        Toast.makeText(this, "loaded after calling onResume", Toast.LENGTH_SHORT).show();
+    }
+*/
+    @Override
+    protected void onDestroy() {
+        // Remember data
+        savePreferences();
+        //closing database connection
+        dataListHolder.close();
+        super.onDestroy();
+    }
+
+    void savePreferences() {
+        SharedPreferences.Editor ed = mSettings.edit();
+        ed.putString(APP_PREFERENCES_LIST_NAME, listName);
+        ed.apply();
+    }
+
+    void loadPreferences() {
+        if (mSettings.contains(APP_PREFERENCES_LIST_NAME)) {
+            listName = mSettings.getString(APP_PREFERENCES_LIST_NAME, "");
+        } else listName = "Newlist1";
+    }
 }

@@ -14,6 +14,7 @@ import android.widget.TextView;
 
 import com.shoppinglist.rdproject.shoppinglist.DBHelper;
 import com.shoppinglist.rdproject.shoppinglist.DataListHolder;
+import com.shoppinglist.rdproject.shoppinglist.MainScreen;
 import com.shoppinglist.rdproject.shoppinglist.Product;
 import com.shoppinglist.rdproject.shoppinglist.R;
 
@@ -30,11 +31,11 @@ public class RVAdapterToDo extends RecyclerView.Adapter<RVAdapterToDo.ProductVie
         return product;
     }
 
-    public RVAdapterToDo(Context context, List<Product> product, int layoutId){
+    public RVAdapterToDo(Context context, List<Product> product, int layoutId, String listName){
         this.product = product;
         this.layoutId = layoutId;
         this.context = context;
-        dataListHolder = new DataListHolder(context);
+        dataListHolder = new DataListHolder(context, listName);
     }
     @Override
     public ProductViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
