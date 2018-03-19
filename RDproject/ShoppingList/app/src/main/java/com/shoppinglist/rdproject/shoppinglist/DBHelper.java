@@ -15,7 +15,7 @@ public class DBHelper extends SQLiteOpenHelper {
     public static final String COLUMN_STATUS = "STATUS";
     public static final int STATUS_TODO = 0;
     public static final int STATUS_DONE = 1;
-    public String tableName = "Newlist";
+    public String tableName;
   //  public static final DBHelper dbHelper;
 
     public DBHelper(Context context) {

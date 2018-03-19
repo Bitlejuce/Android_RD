@@ -12,6 +12,7 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -36,6 +37,7 @@ public class MainScreen extends AppCompatActivity
     private List<Product> shoppingList;
     private List<Product> doneList;
     private String listName;
+    private List<String> listOfLists;
 
 
     @Override
@@ -70,6 +72,7 @@ public class MainScreen extends AppCompatActivity
         dataListHolder = new DataListHolder(MainScreen.this, listName);
         shoppingList = dataListHolder.getShoppingList();
         doneList = dataListHolder.getDoneList();
+        listOfLists = dataListHolder.getListOfLists();
 
         rViewToDo = (RecyclerView) findViewById(R.id.lis_to_do);
         rViewToDo.setHasFixedSize(true);
@@ -84,6 +87,7 @@ public class MainScreen extends AppCompatActivity
         rViewDone.setLayoutManager(rLayoutManagerDone);
         rAdapterDone = new RVAdapterToDo(this, doneList, R.id.list_done, listName);
         rViewDone.setAdapter(rAdapterDone);
+
     }
 
     @Override  // here we receive users input in Dialog and add it to shopping list
@@ -151,11 +155,11 @@ public class MainScreen extends AppCompatActivity
 
         } else if (id == R.id.nav_manage) {
 
-        } else if (id == R.id.nav_share) {
-            Toast.makeText(this, "Cannot share yet", Toast.LENGTH_SHORT).show();
-            return true;
-        } else if (id == R.id.nav_send) {
-
+        } else if (id == R.id.new_list) {
+           // this.listName = "NewTestTable1";
+         //  dataListHolder.createTableIfNotExists(listName);
+            Log.d("TEST", listOfLists.toString());
+            //return true;
         }
 
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
@@ -196,6 +200,7 @@ public class MainScreen extends AppCompatActivity
     void loadPreferences() {
         if (mSettings.contains(APP_PREFERENCES_LIST_NAME)) {
             listName = mSettings.getString(APP_PREFERENCES_LIST_NAME, "");
-        } else listName = "Newlist1";
+        }
+        else listName = "Newlist1";
     }
 }
