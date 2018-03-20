@@ -156,9 +156,12 @@ public class MainScreen extends AppCompatActivity
         } else if (id == R.id.nav_manage) {
 
         } else if (id == R.id.new_list) {
-           // this.listName = "NewTestTable1";
-         //  dataListHolder.createTableIfNotExists(listName);
+            this.listName = "Newlist1";
+           dataListHolder.createTableIfNotExists(listName);
             Log.d("TEST", listOfLists.toString());
+            Log.d("TEST", listName);
+
+            Toast.makeText(this, listOfLists.toString(), Toast.LENGTH_LONG).show();
             //return true;
         }
 
@@ -186,6 +189,7 @@ public class MainScreen extends AppCompatActivity
     protected void onDestroy() {
         // Remember data
         savePreferences();
+        Log.d("TEST", listName);
         //closing database connection
         dataListHolder.close();
         super.onDestroy();
@@ -200,6 +204,7 @@ public class MainScreen extends AppCompatActivity
     void loadPreferences() {
         if (mSettings.contains(APP_PREFERENCES_LIST_NAME)) {
             listName = mSettings.getString(APP_PREFERENCES_LIST_NAME, "");
+            Log.d("TEST", listName);
         }
         else listName = "Newlist1";
     }

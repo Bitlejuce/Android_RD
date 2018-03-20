@@ -80,8 +80,8 @@ public class DataListHolder {
                 COLUMN_NAME + " TEXT, " +
                 COLUMN_QUANTITY + " TEXT, " +
                 COLUMN_STATUS + " INTEGER); ";
-        shoppingListDB.rawQuery(query, null);
-        dbHelper.onUpgrade(shoppingListDB, 1, 2);
+        shoppingListDB.execSQL(query);
+        //dbHelper.onUpgrade(shoppingListDB, 1, 2);
         Log.d("TEST", "createTableIfNotExists called");
     }
 
@@ -122,6 +122,8 @@ public class DataListHolder {
             }
         }
         c.close();
+        arrTblNames.remove("android_metadata");
+        arrTblNames.remove("sqlite_sequence");
         return arrTblNames;
     }
 }
