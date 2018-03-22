@@ -13,24 +13,29 @@ import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
+import android.util.SparseArray;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.Toast;
 
-import com.shoppinglist.rdproject.shoppinglist.adapters.RVAdapterToDo;
+import com.shoppinglist.rdproject.shoppinglist.adapters.RVAdapter;
+import com.shoppinglist.rdproject.shoppinglist.dialogs.AddDialog;
+import com.shoppinglist.rdproject.shoppinglist.dialogs.AddListDialog;
 
+import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 public class MainScreen extends AppCompatActivity
-        implements NavigationView.OnNavigationItemSelectedListener, AddDialog.OnTextInputListener {
+        implements NavigationView.OnNavigationItemSelectedListener, AddDialog.OnTextInputListener, AddListDialog.OnListNameInputListener {
     public static final String APP_PREFERENCES = "listsettings";
     public static final String APP_PREFERENCES_LIST_NAME = "listname";
     private SharedPreferences mSettings;
     private RecyclerView rViewToDo;
     private RecyclerView rViewDone;
-    private RVAdapterToDo rAdapterToDo;
-    private RVAdapterToDo rAdapterDone;
+    private RVAdapter rAdapterToDo;
+    private RVAdapter rAdapterDone;
     private RecyclerView.LayoutManager rLayoutManagerDo;
     private RecyclerView.LayoutManager rLayoutManagerDone;
     private DataListHolder dataListHolder;
@@ -38,6 +43,7 @@ public class MainScreen extends AppCompatActivity
     private List<Product> doneList;
     private String listName;
     private List<String> listOfLists;
+    private SparseArray<String> mapOfLists;
 
 
     @Override
@@ -72,20 +78,21 @@ public class MainScreen extends AppCompatActivity
         dataListHolder = new DataListHolder(MainScreen.this, listName);
         shoppingList = dataListHolder.getShoppingList();
         doneList = dataListHolder.getDoneList();
-        listOfLists = dataListHolder.getListOfLists();
+        //listOfLists = dataListHolder.getListOfLists();
+        mapOfLists = dataListHolder.getmapOfLists();
 
-        rViewToDo = (RecyclerView) findViewById(R.id.lis_to_do);
+        rViewToDo = findViewById(R.id.lis_to_do);
         rViewToDo.setHasFixedSize(true);
         rLayoutManagerDo = new LinearLayoutManager(this);
         rViewToDo.setLayoutManager(rLayoutManagerDo);
-        rAdapterToDo = new RVAdapterToDo(this, shoppingList, R.id.lis_to_do, listName);
+        rAdapterToDo = new RVAdapter(this, shoppingList, R.id.lis_to_do, listName);
         rViewToDo.setAdapter(rAdapterToDo);
 
-        rViewDone = (RecyclerView) findViewById(R.id.list_done);
+        rViewDone = findViewById(R.id.list_done);
         rViewDone.setHasFixedSize(true);
         rLayoutManagerDone = new LinearLayoutManager(this);
         rViewDone.setLayoutManager(rLayoutManagerDone);
-        rAdapterDone = new RVAdapterToDo(this, doneList, R.id.list_done, listName);
+        rAdapterDone = new RVAdapter(this, doneList, R.id.list_done, listName);
         rViewDone.setAdapter(rAdapterDone);
 
     }
@@ -94,8 +101,21 @@ public class MainScreen extends AppCompatActivity
     public void getUserInput(String input, String quantity) {
         Product product = new Product(input, quantity, 0);
         shoppingList.add(0, product);
-        rAdapterToDo.notifyDataSetChanged();
+        rAdapterToDo.notifyItemInserted(0);
         dataListHolder.insert(product);
+    }
+    @Override  // here we get name of new list
+    public void getListNameInput(String input) {
+        this.listName = input;
+        setTitle(input);
+        dataListHolder.createTableIfNotExists(input);
+        //listOfLists = dataListHolder.getListOfLists();
+        shoppingList.clear();
+        doneList.clear();
+        shoppingList.addAll(dataListHolder.getShoppingList());
+        doneList.addAll(dataListHolder.getDoneList());
+        rAdapterToDo.notifyDataSetChanged();
+        rAdapterDone.notifyDataSetChanged();
     }
 
     @Override
@@ -156,13 +176,8 @@ public class MainScreen extends AppCompatActivity
         } else if (id == R.id.nav_manage) {
 
         } else if (id == R.id.new_list) {
-            this.listName = "Newlist1";
-           dataListHolder.createTableIfNotExists(listName);
-            Log.d("TEST", listOfLists.toString());
-            Log.d("TEST", listName);
-
-            Toast.makeText(this, listOfLists.toString(), Toast.LENGTH_LONG).show();
-            //return true;
+            new AddListDialog().show(getFragmentManager(), "AddListDialog");
+          // dataListHolder.createTableIfNotExists(listName);
         }
 
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
@@ -189,7 +204,6 @@ public class MainScreen extends AppCompatActivity
     protected void onDestroy() {
         // Remember data
         savePreferences();
-        Log.d("TEST", listName);
         //closing database connection
         dataListHolder.close();
         super.onDestroy();
@@ -208,4 +222,6 @@ public class MainScreen extends AppCompatActivity
         }
         else listName = "Newlist1";
     }
+
+
 }

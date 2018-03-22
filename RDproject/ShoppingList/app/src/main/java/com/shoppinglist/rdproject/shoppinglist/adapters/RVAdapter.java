@@ -1,27 +1,23 @@
 package com.shoppinglist.rdproject.shoppinglist.adapters;
 
 import android.content.Context;
-import android.graphics.Color;
-import android.graphics.drawable.Drawable;
 import android.support.design.widget.Snackbar;
 import android.support.v7.widget.CardView;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.shoppinglist.rdproject.shoppinglist.DBHelper;
 import com.shoppinglist.rdproject.shoppinglist.DataListHolder;
-import com.shoppinglist.rdproject.shoppinglist.MainScreen;
 import com.shoppinglist.rdproject.shoppinglist.Product;
 import com.shoppinglist.rdproject.shoppinglist.R;
 
 import java.util.List;
 
 
-public class RVAdapterToDo extends RecyclerView.Adapter<RVAdapterToDo.ProductViewHolder>{
+public class RVAdapter extends RecyclerView.Adapter<RVAdapter.ProductViewHolder>{
 
     private List<Product> product;
     private int layoutId;
@@ -31,7 +27,7 @@ public class RVAdapterToDo extends RecyclerView.Adapter<RVAdapterToDo.ProductVie
         return product;
     }
 
-    public RVAdapterToDo(Context context, List<Product> product, int layoutId, String listName){
+    public RVAdapter(Context context, List<Product> product, int layoutId, String listName){
         this.product = product;
         this.layoutId = layoutId;
         this.context = context;
@@ -95,8 +91,8 @@ public class RVAdapterToDo extends RecyclerView.Adapter<RVAdapterToDo.ProductVie
                     listFrom = (RecyclerView) view.getRootView().findViewById(R.id.list_done);   // testing
                 }
 
-                RVAdapterToDo adapterFrom = (RVAdapterToDo) listFrom.getAdapter();
-                RVAdapterToDo adapterTo = (RVAdapterToDo) listTo.getAdapter();
+                RVAdapter adapterFrom = (RVAdapter) listFrom.getAdapter();
+                RVAdapter adapterTo = (RVAdapter) listTo.getAdapter();
 
                 product = adapterFrom.getProductList().get(position);
                 if (product.getStatus() == DBHelper.STATUS_TODO) {

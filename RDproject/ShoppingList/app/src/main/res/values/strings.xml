@@ -18,4 +18,6 @@
     <string name="enter_quantity">Enter quantity</string>
     <string name="available_lists">Available lists</string>
     <string name="create_new_list">Create new list</string>
+    <string name="add_new_list">Add new list</string>
+    <string name="list_name">List name</string>
 </resources>

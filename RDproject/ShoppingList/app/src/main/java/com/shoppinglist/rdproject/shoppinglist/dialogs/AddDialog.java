@@ -1,9 +1,8 @@
-package com.shoppinglist.rdproject.shoppinglist;
+package com.shoppinglist.rdproject.shoppinglist.dialogs;
 
 import android.app.Dialog;
 import android.app.DialogFragment;
 import android.content.Context;
-import android.content.DialogInterface;
 import android.os.Bundle;
 import android.support.v7.app.AlertDialog;
 import android.view.LayoutInflater;
@@ -11,7 +10,8 @@ import android.view.View;
 import android.view.WindowManager;
 import android.widget.Button;
 import android.widget.EditText;
-import android.widget.Toast;
+
+import com.shoppinglist.rdproject.shoppinglist.R;
 
 public class AddDialog extends DialogFragment {
     private EditText input, qty;

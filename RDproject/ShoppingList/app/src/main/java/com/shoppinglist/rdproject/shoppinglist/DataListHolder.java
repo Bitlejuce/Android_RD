@@ -6,17 +6,17 @@ import android.content.Context;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.util.Log;
+import android.util.SparseArray;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import static com.shoppinglist.rdproject.shoppinglist.DBHelper.*;
 
 public class DataListHolder {
 
-    private List<Product> shoppingList;
-    private List<Product> doneList;
-    private List<String> listTables;
     private Context context;
     private SQLiteDatabase shoppingListDB;
     private String tableName;
@@ -125,5 +125,12 @@ public class DataListHolder {
         arrTblNames.remove("android_metadata");
         arrTblNames.remove("sqlite_sequence");
         return arrTblNames;
+    }
+    public SparseArray<String> getmapOfLists(){
+        SparseArray<String> sparseList = new SparseArray<>();
+        for (int i = 0; i < getListOfLists().size(); i++) {
+            sparseList.put(i, getListOfLists().get(i));
+        }
+        return sparseList;
     }
 }
