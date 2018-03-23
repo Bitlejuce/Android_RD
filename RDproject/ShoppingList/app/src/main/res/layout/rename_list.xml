@@ -3,7 +3,7 @@
     android:orientation="vertical"
     android:layout_width="wrap_content"
     android:layout_height="wrap_content"
-    android:id="@+id/add_list">
+    android:id="@+id/rename_list">
 
     <TextView
         android:id="@+id/head"
@@ -13,7 +13,7 @@
         android:textSize="10pt"
         android:textStyle="bold|italic"
         android:gravity="center"
-        android:text="@string/add_new_list"
+        android:text="@string/rename_list_header"
         android:textColorLink="@color/colorAccent" />
 
     <EditText
@@ -52,7 +52,7 @@
             android:layout_width="wrap_content"
             android:layout_height="60dp"
             android:layout_weight="1"
-            android:text="@string/add" />
+            android:text="@string/rename_list" />
     </LinearLayout>
 
 </LinearLayout>

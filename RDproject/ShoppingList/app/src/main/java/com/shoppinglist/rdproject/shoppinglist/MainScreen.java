@@ -22,13 +22,15 @@ import android.widget.Toast;
 import com.shoppinglist.rdproject.shoppinglist.adapters.RVAdapter;
 import com.shoppinglist.rdproject.shoppinglist.dialogs.AddDialog;
 import com.shoppinglist.rdproject.shoppinglist.dialogs.AddListDialog;
+import com.shoppinglist.rdproject.shoppinglist.dialogs.RenameListDialog;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
 public class MainScreen extends AppCompatActivity
-        implements NavigationView.OnNavigationItemSelectedListener, AddDialog.OnTextInputListener, AddListDialog.OnListNameInputListener {
+        implements NavigationView.OnNavigationItemSelectedListener, AddDialog.OnTextInputListener, AddListDialog.OnListNameInputListener,
+        RenameListDialog.OnListListRenameListener {
     public static final String APP_PREFERENCES = "listsettings";
     public static final String APP_PREFERENCES_LIST_NAME = "listname";
     private SharedPreferences mSettings;
@@ -79,7 +81,7 @@ public class MainScreen extends AppCompatActivity
         shoppingList = dataListHolder.getShoppingList();
         doneList = dataListHolder.getDoneList();
         //listOfLists = dataListHolder.getListOfLists();
-        mapOfLists = dataListHolder.getmapOfLists();
+       // mapOfLists = dataListHolder.getMapOfLists();
 
         rViewToDo = findViewById(R.id.lis_to_do);
         rViewToDo.setHasFixedSize(true);
@@ -117,7 +119,12 @@ public class MainScreen extends AppCompatActivity
         rAdapterToDo.notifyDataSetChanged();
         rAdapterDone.notifyDataSetChanged();
     }
-
+    @Override
+    public void getNewListNameInput(String input) {
+        dataListHolder.renameTable(input);
+        this.listName = input;
+        setTitle(input);
+    }
     @Override
     public void onBackPressed() {
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
@@ -144,6 +151,17 @@ public class MainScreen extends AppCompatActivity
             case R.id.share:
                 Toast.makeText(this, "Cannot share yet", Toast.LENGTH_SHORT).show();
                 return true;
+            case R.id.rename:
+                new RenameListDialog().show(getFragmentManager(), "RenameListDialog");
+                return true;
+            case R.id.delete:
+                return true;
+
+            case R.id.clear_done:
+                doneList.clear();
+                rAdapterDone.notifyDataSetChanged();
+                dataListHolder.deleteDone();
+                return true;
             case R.id.clear_all:
                 shoppingList.clear();
                 doneList.clear();
@@ -151,17 +169,11 @@ public class MainScreen extends AppCompatActivity
                 rAdapterDone.notifyDataSetChanged();
                 dataListHolder.deleteAll();
                 return true;
-            case R.id.clear_done:
-                doneList.clear();
-                rAdapterDone.notifyDataSetChanged();
-                dataListHolder.deleteDone();
-                return true;
         }
 
         return super.onOptionsItemSelected(item);
     }
 
-    @SuppressWarnings("StatementWithEmptyBody")
     @Override
     public boolean onNavigationItemSelected(MenuItem item) {
         // Handle navigation view item clicks here.
@@ -173,7 +185,7 @@ public class MainScreen extends AppCompatActivity
 
         } else if (id == R.id.nav_slideshow) {
 
-        } else if (id == R.id.nav_manage) {
+        } else if (id == R.id.help) {
 
         } else if (id == R.id.new_list) {
             new AddListDialog().show(getFragmentManager(), "AddListDialog");
@@ -222,6 +234,7 @@ public class MainScreen extends AppCompatActivity
         }
         else listName = "Newlist1";
     }
+
 
 
 }

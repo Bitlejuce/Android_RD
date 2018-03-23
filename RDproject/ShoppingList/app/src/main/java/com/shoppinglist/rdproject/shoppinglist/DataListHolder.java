@@ -72,6 +72,16 @@ public class DataListHolder {
             return arr;
 
     }
+    public void renameTable(String newName){
+        shoppingListDB.beginTransaction();
+        try{
+            shoppingListDB.execSQL("ALTER TABLE " + tableName + " RENAME TO " + newName+";");
+            shoppingListDB.setTransactionSuccessful();
+            tableName = newName;
+        } finally{
+            shoppingListDB.endTransaction();
+        }
+    }
 
     public void createTableIfNotExists(String tableName) {
         this.tableName = tableName;
@@ -126,7 +136,7 @@ public class DataListHolder {
         arrTblNames.remove("sqlite_sequence");
         return arrTblNames;
     }
-    public SparseArray<String> getmapOfLists(){
+    public SparseArray<String> getMapOfLists(){
         SparseArray<String> sparseList = new SparseArray<>();
         for (int i = 0; i < getListOfLists().size(); i++) {
             sparseList.put(i, getListOfLists().get(i));

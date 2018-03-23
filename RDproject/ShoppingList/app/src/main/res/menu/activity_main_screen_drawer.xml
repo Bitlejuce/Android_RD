@@ -1,9 +1,12 @@
 <?xml version="1.0" encoding="utf-8"?>
 <menu xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     tools:showIn="navigation_view">
 
-    <group android:checkableBehavior="single">
+    <group
+        android:id="@+id/first_group"
+        android:checkableBehavior="none">
         <item
             android:id="@+id/nav_camera"
             android:icon="@drawable/ic_menu_camera"
@@ -17,19 +20,26 @@
             android:icon="@drawable/ic_menu_slideshow"
             android:title="Slideshow" />
         <item
-            android:id="@+id/nav_manage"
+            android:id="@+id/help"
             android:icon="@drawable/ic_menu_manage"
-            android:title="Tools" />
+            android:title="@string/help_menu" />
     </group>
 
-    <item android:title="@string/available_lists">
-        <menu>
-            <item
-                android:id="@+id/new_list"
-                android:icon="@android:drawable/ic_menu_add"
-                android:title="@string/create_new_list" />
-        </menu>
-    </item>
+
+    <group
+        android:id="@+id/second_group"
+        android:checkableBehavior="none">
+        <item
+            android:id="@+id/new_list"
+            android:icon="?android:attr/actionModePasteDrawable"
+            android:title="@string/create_new_list" />
+
+        <item
+            android:visible="false"
+            android:id="@+id/list_of_the_lists"
+            android:title="list_of_the_lists"
+            app:showAsAction="always" />
+    </group>
 
 
 </menu>
