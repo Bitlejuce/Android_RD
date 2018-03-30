@@ -22,7 +22,7 @@
         app:itemIconTint="@color/colorAccent"
         app:itemTextColor="@color/colorPrimaryDark"
         app:headerLayout="@layout/nav_header_main_screen"
-        app:menu="@menu/activity_main_screen_drawer" >
+        app:menu="@menu/activity_main_screen_drawer">
 
     </android.support.design.widget.NavigationView>
 

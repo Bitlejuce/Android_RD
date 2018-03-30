@@ -1,5 +1,6 @@
 package com.shoppinglist.rdproject.shoppinglist;
 
+import android.app.DialogFragment;
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.os.Bundle;
@@ -13,26 +14,29 @@ import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
-import android.util.SparseArray;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.Toast;
 
 import com.shoppinglist.rdproject.shoppinglist.adapters.RVAdapter;
-import com.shoppinglist.rdproject.shoppinglist.dialogs.AddDialog;
-import com.shoppinglist.rdproject.shoppinglist.dialogs.AddListDialog;
-import com.shoppinglist.rdproject.shoppinglist.dialogs.RenameListDialog;
+import com.shoppinglist.rdproject.shoppinglist.dialogs.*;
+
+import org.json.JSONException;
+import org.json.JSONObject;
 
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
 public class MainScreen extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener, AddDialog.OnTextInputListener, AddListDialog.OnListNameInputListener,
-        RenameListDialog.OnListListRenameListener {
+        RenameListDialog.OnListListRenameListener, ChooseListDialog.OnChooseListListener, ModifyListDialog.OnModifyListListener {
     public static final String APP_PREFERENCES = "listsettings";
-    public static final String APP_PREFERENCES_LIST_NAME = "listname";
+    public static final String APP_PREFERENCES_LIST_NAME = "listName";
+    private static final String APP_PREFERENCES_MAP_OF_LISTS = "mapOfLists";
     private SharedPreferences mSettings;
     private RecyclerView rViewToDo;
     private RecyclerView rViewDone;
@@ -44,8 +48,8 @@ public class MainScreen extends AppCompatActivity
     private List<Product> shoppingList;
     private List<Product> doneList;
     private String listName;
-    private List<String> listOfLists;
-    private SparseArray<String> mapOfLists;
+    //private List<String> listOfListsToDisplay;
+    private Map<String, String> mapOfLists;
 
 
     @Override
@@ -76,25 +80,23 @@ public class MainScreen extends AppCompatActivity
         // start code
         mSettings = getSharedPreferences(APP_PREFERENCES, Context.MODE_PRIVATE);
         loadPreferences();
-        setTitle(listName);
+        setTitle(mapOfLists.get(listName));
         dataListHolder = new DataListHolder(MainScreen.this, listName);
         shoppingList = dataListHolder.getShoppingList();
         doneList = dataListHolder.getDoneList();
-        //listOfLists = dataListHolder.getListOfLists();
-       // mapOfLists = dataListHolder.getMapOfLists();
 
         rViewToDo = findViewById(R.id.lis_to_do);
         rViewToDo.setHasFixedSize(true);
         rLayoutManagerDo = new LinearLayoutManager(this);
         rViewToDo.setLayoutManager(rLayoutManagerDo);
-        rAdapterToDo = new RVAdapter(this, shoppingList, R.id.lis_to_do, listName);
+        rAdapterToDo = new RVAdapter(this, shoppingList, R.id.lis_to_do, dataListHolder);
         rViewToDo.setAdapter(rAdapterToDo);
 
         rViewDone = findViewById(R.id.list_done);
         rViewDone.setHasFixedSize(true);
         rLayoutManagerDone = new LinearLayoutManager(this);
         rViewDone.setLayoutManager(rLayoutManagerDone);
-        rAdapterDone = new RVAdapter(this, doneList, R.id.list_done, listName);
+        rAdapterDone = new RVAdapter(this, doneList, R.id.list_done, dataListHolder);
         rViewDone.setAdapter(rAdapterDone);
 
     }
@@ -108,10 +110,61 @@ public class MainScreen extends AppCompatActivity
     }
     @Override  // here we get name of new list
     public void getListNameInput(String input) {
-        this.listName = input;
+        String newTableName = "Newlist" + (dataListHolder.getMaxIndexOfTable() + 1);
+        this.listName = newTableName;
+        mapOfLists.put(newTableName, input);
         setTitle(input);
-        dataListHolder.createTableIfNotExists(input);
-        //listOfLists = dataListHolder.getListOfLists();
+        renewViewOfMainScreen(newTableName);
+    }
+
+    @Override  // here we get NEW name of new list
+    public void getNewListNameInput(String input) {
+        mapOfLists.put(listName, input);
+        setTitle(input);
+    }
+    @Override
+    public void getUserChoice(String listNameToDisplay) {
+        for (String key : mapOfLists.keySet()) {
+            if (mapOfLists.get(key).equals(listNameToDisplay)) {
+                listName = key;
+                break;
+            }
+        }
+        setTitle(listNameToDisplay);
+        renewViewOfMainScreen(listName);
+    }
+    @Override
+    public void getUserConfirm(String option) {
+            if (option.equals(getResources().getString(R.string.delete_list))) {
+                dataListHolder.deleteTable(listName);
+                mapOfLists.remove(listName);
+
+                if (mapOfLists.isEmpty()) {
+                    renewViewOfMainScreen("Newlist1");
+                } else {
+                    String firstTable = dataListHolder.getListOfLists().get(0);
+                    listName = firstTable;
+                    setTitle(mapOfLists.get(firstTable));
+                    renewViewOfMainScreen(firstTable);
+                }
+                return;
+            }else if(option.equals(getResources().getString(R.string.clear_done))) {
+                doneList.clear();
+                rAdapterDone.notifyDataSetChanged();
+                dataListHolder.deleteDone();
+                return;
+            }else if(option.equals(getResources().getString(R.string.clear_all))) {
+                shoppingList.clear();
+                doneList.clear();
+                rAdapterToDo.notifyDataSetChanged();
+                rAdapterDone.notifyDataSetChanged();
+                dataListHolder.deleteAll();
+                return;
+        }
+    }
+
+    private void renewViewOfMainScreen(String newTableName) {
+        dataListHolder.createTableIfNotExists(newTableName);
         shoppingList.clear();
         doneList.clear();
         shoppingList.addAll(dataListHolder.getShoppingList());
@@ -119,12 +172,7 @@ public class MainScreen extends AppCompatActivity
         rAdapterToDo.notifyDataSetChanged();
         rAdapterDone.notifyDataSetChanged();
     }
-    @Override
-    public void getNewListNameInput(String input) {
-        dataListHolder.renameTable(input);
-        this.listName = input;
-        setTitle(input);
-    }
+
     @Override
     public void onBackPressed() {
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
@@ -144,9 +192,7 @@ public class MainScreen extends AppCompatActivity
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
-        // Handle action bar item clicks here. The action bar will
-        // automatically handle clicks on the Home/Up button, so long
-        // as you specify a parent activity in AndroidManifest.xml.
+        ModifyListDialog modifyDialog;
         switch (item.getItemId()) {
             case R.id.share:
                 Toast.makeText(this, "Cannot share yet", Toast.LENGTH_SHORT).show();
@@ -155,19 +201,19 @@ public class MainScreen extends AppCompatActivity
                 new RenameListDialog().show(getFragmentManager(), "RenameListDialog");
                 return true;
             case R.id.delete:
+                modifyDialog = new ModifyListDialog();
+                modifyDialog.setOption(getResources().getString(R.string.delete_list));
+                modifyDialog.show(getFragmentManager(), "ModifyListDialog");
                 return true;
-
             case R.id.clear_done:
-                doneList.clear();
-                rAdapterDone.notifyDataSetChanged();
-                dataListHolder.deleteDone();
+                modifyDialog = new ModifyListDialog();
+                modifyDialog.setOption(getResources().getString(R.string.clear_done));
+                modifyDialog.show(getFragmentManager(), "ModifyListDialog");
                 return true;
             case R.id.clear_all:
-                shoppingList.clear();
-                doneList.clear();
-                rAdapterToDo.notifyDataSetChanged();
-                rAdapterDone.notifyDataSetChanged();
-                dataListHolder.deleteAll();
+                modifyDialog = new ModifyListDialog();
+                modifyDialog.setOption(getResources().getString(R.string.clear_all));
+                modifyDialog.show(getFragmentManager(), "ModifyListDialog");
                 return true;
         }
 
@@ -180,7 +226,7 @@ public class MainScreen extends AppCompatActivity
         int id = item.getItemId();
 
         if (id == R.id.nav_camera) {
-            // Handle the camera action
+            // Handle the action
         } else if (id == R.id.nav_gallery) {
 
         } else if (id == R.id.nav_slideshow) {
@@ -189,7 +235,8 @@ public class MainScreen extends AppCompatActivity
 
         } else if (id == R.id.new_list) {
             new AddListDialog().show(getFragmentManager(), "AddListDialog");
-          // dataListHolder.createTableIfNotExists(listName);
+        } else if (id == R.id.choose_list) {
+            new ChooseListDialog().show(getFragmentManager(), "AddListDialog");
         }
 
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
@@ -224,17 +271,49 @@ public class MainScreen extends AppCompatActivity
     void savePreferences() {
         SharedPreferences.Editor ed = mSettings.edit();
         ed.putString(APP_PREFERENCES_LIST_NAME, listName);
+        ed.putString(APP_PREFERENCES_MAP_OF_LISTS, saveMapToString(mapOfLists));
         ed.apply();
     }
 
     void loadPreferences() {
         if (mSettings.contains(APP_PREFERENCES_LIST_NAME)) {
             listName = mSettings.getString(APP_PREFERENCES_LIST_NAME, "");
+            String savedMap = mSettings.getString(APP_PREFERENCES_MAP_OF_LISTS, "");
+            mapOfLists = getSavedMap(savedMap);
             Log.d("TEST", listName);
         }
-        else listName = "Newlist1";
+        else {
+            listName = "Newlist1";
+            mapOfLists = new HashMap<>();
+            mapOfLists.put(listName, listName);
+        }
     }
+    private Map<String, String> getSavedMap(String mapSavedToString) {
+        Map<String, String> map = new HashMap<>();
+        try {
+            JSONObject jsonObject = new JSONObject(mapSavedToString);
+            Iterator<String> keysItr = jsonObject.keys();
+            while(keysItr.hasNext()) {
+                String key = keysItr.next();
+                String value = (String) jsonObject.get(key);
+                map.put(key, value);
+            }
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+        return map;
+    }
+    private String saveMapToString(Map<String, String> map) {
+        JSONObject jsonObject = new JSONObject(map);
+        return jsonObject.toString();
 
+    }
+    public List<String> getListOfTablesToDisplay() {
+        List<String> list = new ArrayList<>();
+        for (String s: mapOfLists.keySet())
+            list.add(mapOfLists.get(s));
+        return list;
+    }
 
 
 }

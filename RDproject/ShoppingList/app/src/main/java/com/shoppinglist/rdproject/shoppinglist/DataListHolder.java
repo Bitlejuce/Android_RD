@@ -37,6 +37,7 @@ public class DataListHolder {
         cv.put(DBHelper.COLUMN_STATUS, DBHelper.STATUS_TODO);
         return shoppingListDB.insert(tableName, null, cv);
     }
+
     public int update(Product product) {
         ContentValues cv = new ContentValues();
         cv.put(COLUMN_NAME, product.getName());
@@ -44,17 +45,25 @@ public class DataListHolder {
         cv.put(DBHelper.COLUMN_STATUS, product.getStatus());
         return shoppingListDB.update(tableName, cv, COLUMN_NAME + " = ?", new String[] {String.valueOf(product.getName()) });
     }
+
     public int deleteAll() {
         return shoppingListDB.delete(tableName, null, null);
     }
+
      public void delete(Product product) {
         shoppingListDB.delete(tableName, COLUMN_NAME + " = ?", new String[] { String.valueOf(product.getName()) });
     }
+
+    public void deleteTable(String table){
+        shoppingListDB.execSQL("DROP TABLE IF EXISTS " + table);
+    }
+
     public void deleteDone() {
         for (Product p: getDoneList()) {
             shoppingListDB.delete(tableName, COLUMN_NAME + " = ?", new String[] { String.valueOf(p.getName()) });
         }
     }
+
     public ArrayList<Product> selectAll() {
         ArrayList<Product> arr = new ArrayList<>();
 
@@ -72,7 +81,7 @@ public class DataListHolder {
             return arr;
 
     }
-    public void renameTable(String newName){
+   /* public void renameTable(String newName){
         shoppingListDB.beginTransaction();
         try{
             shoppingListDB.execSQL("ALTER TABLE " + tableName + " RENAME TO " + newName+";");
@@ -81,7 +90,7 @@ public class DataListHolder {
         } finally{
             shoppingListDB.endTransaction();
         }
-    }
+    }*/
 
     public void createTableIfNotExists(String tableName) {
         this.tableName = tableName;
@@ -136,11 +145,14 @@ public class DataListHolder {
         arrTblNames.remove("sqlite_sequence");
         return arrTblNames;
     }
-    public SparseArray<String> getMapOfLists(){
-        SparseArray<String> sparseList = new SparseArray<>();
-        for (int i = 0; i < getListOfLists().size(); i++) {
-            sparseList.put(i, getListOfLists().get(i));
+
+    public int getMaxIndexOfTable(){
+        int index = 0;
+        List<String> arrTblNames = getListOfLists();
+        for (String s: arrTblNames){
+            int listIndex = Integer.parseInt(s.replace("Newlist", ""));
+            index = index > listIndex ? index : listIndex;
         }
-        return sparseList;
+        return index;
     }
 }

@@ -27,11 +27,11 @@ public class RVAdapter extends RecyclerView.Adapter<RVAdapter.ProductViewHolder>
         return product;
     }
 
-    public RVAdapter(Context context, List<Product> product, int layoutId, String listName){
+    public RVAdapter(Context context, List<Product> product, int layoutId, DataListHolder dataListHolder){
         this.product = product;
         this.layoutId = layoutId;
         this.context = context;
-        dataListHolder = new DataListHolder(context, listName);
+        this.dataListHolder = dataListHolder;
     }
     @Override
     public ProductViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
