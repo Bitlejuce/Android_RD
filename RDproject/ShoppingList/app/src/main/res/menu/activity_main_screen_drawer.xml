@@ -4,9 +4,8 @@
     xmlns:tools="http://schemas.android.com/tools"
     tools:showIn="navigation_view">
 
-
     <group
-        android:id="@+id/second_group"
+        android:id="@+id/first_group"
         android:checkableBehavior="none">
         <item
             android:id="@+id/new_list"
@@ -14,27 +13,32 @@
             android:title="@string/create_new_list" />
 
         <item
+            android:visible="true"
             android:id="@+id/choose_list"
             android:icon="@drawable/ic_format_list_bulleted_black_24dp"
             android:title="@string/choose_list" />
     </group>
 
     <group
-        android:id="@+id/first_group"
+        android:id="@+id/second_group"
         android:checkableBehavior="none">
         <item
+            android:visible="false"
             android:id="@+id/nav_camera"
             android:icon="@drawable/ic_menu_camera"
             android:title="Import" />
         <item
+            android:visible="false"
             android:id="@+id/nav_gallery"
             android:icon="@drawable/ic_menu_gallery"
             android:title="Gallery" />
         <item
+            android:visible="false"
             android:id="@+id/nav_slideshow"
             android:icon="@drawable/ic_menu_slideshow"
             android:title="Slideshow" />
         <item
+            android:visible="false"
             android:id="@+id/help"
             android:icon="@drawable/ic_menu_manage"
             android:title="@string/help_menu" />

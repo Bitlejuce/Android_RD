@@ -16,7 +16,7 @@ import com.shoppinglist.rdproject.shoppinglist.MainScreen;
 import com.shoppinglist.rdproject.shoppinglist.R;
 
 import java.util.List;
-
+@Deprecated
 public class ChooseListDialog extends DialogFragment {
     public ChooseListDialog.OnChooseListListener onChooseListListener;
 

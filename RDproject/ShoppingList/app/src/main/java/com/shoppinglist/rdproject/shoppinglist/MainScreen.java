@@ -4,6 +4,7 @@ import android.app.DialogFragment;
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.os.Bundle;
+import android.support.annotation.NonNull;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.NavigationView;
 import android.support.v4.view.GravityCompat;
@@ -16,7 +17,12 @@ import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.MotionEvent;
 import android.view.View;
+import android.widget.AdapterView;
+import android.widget.ArrayAdapter;
+import android.widget.Spinner;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.shoppinglist.rdproject.shoppinglist.adapters.RVAdapter;
@@ -48,8 +54,10 @@ public class MainScreen extends AppCompatActivity
     private List<Product> shoppingList;
     private List<Product> doneList;
     private String listName;
-    //private List<String> listOfListsToDisplay;
+    private List<String> listOfListsToDisplay;
     private Map<String, String> mapOfLists;
+    private Spinner chooseListSpinner;
+    private ArrayAdapter<String> spinnerAdapter;
 
 
     @Override
@@ -98,6 +106,9 @@ public class MainScreen extends AppCompatActivity
         rViewDone.setLayoutManager(rLayoutManagerDone);
         rAdapterDone = new RVAdapter(this, doneList, R.id.list_done, dataListHolder);
         rViewDone.setAdapter(rAdapterDone);
+        listOfListsToDisplay = getListOfTablesToDisplay();
+        chooseListSpinner = createSpinner();
+
 
     }
 
@@ -115,12 +126,18 @@ public class MainScreen extends AppCompatActivity
         mapOfLists.put(newTableName, input);
         setTitle(input);
         renewViewOfMainScreen(newTableName);
+        listOfListsToDisplay.add(0, input);
+        spinnerAdapter.notifyDataSetChanged();
+        chooseListSpinner.setSelection(0);
     }
 
     @Override  // here we get NEW name of new list
     public void getNewListNameInput(String input) {
+        listOfListsToDisplay.remove(mapOfLists.get(listName));
+        listOfListsToDisplay.add(0, input);
         mapOfLists.put(listName, input);
         setTitle(input);
+        spinnerAdapter.notifyDataSetChanged();
     }
     @Override
     public void getUserChoice(String listNameToDisplay) {
@@ -132,19 +149,31 @@ public class MainScreen extends AppCompatActivity
         }
         setTitle(listNameToDisplay);
         renewViewOfMainScreen(listName);
+        chooseListSpinner.setSelection(listOfListsToDisplay.indexOf(listNameToDisplay));
+        DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
+        drawer.closeDrawer(GravityCompat.START);
     }
     @Override
     public void getUserConfirm(String option) {
             if (option.equals(getResources().getString(R.string.delete_list))) {
                 dataListHolder.deleteTable(listName);
+                listOfListsToDisplay.remove(mapOfLists.get(listName));
                 mapOfLists.remove(listName);
 
                 if (mapOfLists.isEmpty()) {
                     renewViewOfMainScreen("Newlist1");
+                    setTitle("Newlist1");
+                    mapOfLists.put("Newlist1", "Newlist1");
+                    listOfListsToDisplay.add("Newlist1");
+                    spinnerAdapter.notifyDataSetChanged();
                 } else {
                     String firstTable = dataListHolder.getListOfLists().get(0);
                     listName = firstTable;
                     setTitle(mapOfLists.get(firstTable));
+                    listOfListsToDisplay.remove(mapOfLists.get(firstTable));
+                    listOfListsToDisplay.add(0, mapOfLists.get(firstTable));
+                    spinnerAdapter.notifyDataSetChanged();
+                    chooseListSpinner.setSelection(0);
                     renewViewOfMainScreen(firstTable);
                 }
                 return;
@@ -171,6 +200,7 @@ public class MainScreen extends AppCompatActivity
         doneList.addAll(dataListHolder.getDoneList());
         rAdapterToDo.notifyDataSetChanged();
         rAdapterDone.notifyDataSetChanged();
+        //createSpinner();
     }
 
     @Override
@@ -236,7 +266,7 @@ public class MainScreen extends AppCompatActivity
         } else if (id == R.id.new_list) {
             new AddListDialog().show(getFragmentManager(), "AddListDialog");
         } else if (id == R.id.choose_list) {
-            new ChooseListDialog().show(getFragmentManager(), "AddListDialog");
+            new ChooseListDialog().show(getFragmentManager(), "ChooseListDialog");
         }
 
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
@@ -251,14 +281,6 @@ public class MainScreen extends AppCompatActivity
        savePreferences();
     }
 
-  /*  @Override
-    protected void onResume() {
-        super.onResume();
-            // Getting listname from preferences
-            loadPreferences();
-        Toast.makeText(this, "loaded after calling onResume", Toast.LENGTH_SHORT).show();
-    }
-*/
     @Override
     protected void onDestroy() {
         // Remember data
@@ -312,8 +334,36 @@ public class MainScreen extends AppCompatActivity
         List<String> list = new ArrayList<>();
         for (String s: mapOfLists.keySet())
             list.add(mapOfLists.get(s));
+        list.remove(mapOfLists.get(listName));
+        list.add(0, mapOfLists.get(listName));
         return list;
     }
+        // spinner will be deleted
+    private Spinner createSpinner() {
+        Spinner spinner = findViewById(R.id.spinner_list);
+        spinnerAdapter = getSpinnerAdapter();
+        spinner.setAdapter(spinnerAdapter);
+        spinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+            @Override
+            public void onItemSelected(AdapterView<?> adapterView, View view, int i, long l) {
+                getUserChoice(listOfListsToDisplay.get(i));
+//                DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
+//                drawer.closeDrawer(GravityCompat.START);
+            }
 
+            @Override
+            public void onNothingSelected(AdapterView<?> adapterView) {
+
+            }
+        });
+        return spinner;
+    }
+
+    @NonNull
+    private ArrayAdapter<String> getSpinnerAdapter() {
+        ArrayAdapter<String> adapter = new ArrayAdapter<>(this, android.R.layout.select_dialog_item, listOfListsToDisplay);
+        adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+        return adapter;
+    }
 
 }
