@@ -38,10 +38,10 @@
             android:icon="@drawable/ic_menu_slideshow"
             android:title="Slideshow" />
         <item
-            android:visible="false"
-            android:id="@+id/help"
-            android:icon="@drawable/ic_menu_manage"
-            android:title="@string/help_menu" />
+            android:visible="true"
+            android:id="@+id/log_out"
+            android:icon="@drawable/ic_exit_to_app_black_24dp"
+            android:title="@string/logout" />
     </group>
 
 </menu>

@@ -1,8 +1,13 @@
 package com.shoppinglist.rdproject.shoppinglist;
 
-import android.app.DialogFragment;
 import android.content.Context;
+import android.content.Intent;
 import android.content.SharedPreferences;
+import android.content.pm.PackageInfo;
+import android.content.pm.PackageManager;
+import android.content.pm.Signature;
+import android.media.audiofx.BassBoost;
+import android.net.Uri;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.design.widget.FloatingActionButton;
@@ -14,32 +19,43 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
+import android.util.Base64;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
-import android.view.MotionEvent;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
+import android.widget.ImageView;
 import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.facebook.FacebookSdk;
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
 import com.shoppinglist.rdproject.shoppinglist.adapters.RVAdapter;
 import com.shoppinglist.rdproject.shoppinglist.dialogs.*;
+import com.shoppinglist.rdproject.shoppinglist.login.LoginActivity;
+import com.squareup.picasso.Picasso;
 
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.security.MessageDigest;
+import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
+import jp.wasabeef.picasso.transformations.CropCircleTransformation;
+
 public class MainScreen extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener, AddDialog.OnTextInputListener, AddListDialog.OnListNameInputListener,
         RenameListDialog.OnListListRenameListener, ChooseListDialog.OnChooseListListener, ModifyListDialog.OnModifyListListener {
+    public static final int LOGIN_RESULT = 2121;
     public static final String APP_PREFERENCES = "listsettings";
     public static final String APP_PREFERENCES_LIST_NAME = "listName";
     private static final String APP_PREFERENCES_MAP_OF_LISTS = "mapOfLists";
@@ -58,6 +74,8 @@ public class MainScreen extends AppCompatActivity
     private Map<String, String> mapOfLists;
     private Spinner chooseListSpinner;
     private ArrayAdapter<String> spinnerAdapter;
+    private DrawerLayout drawer;
+    private FirebaseAuth mAuth;
 
 
     @Override
@@ -68,6 +86,7 @@ public class MainScreen extends AppCompatActivity
         setSupportActionBar(toolbar);
 
         FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
+        //fab.setImageResource(R.drawable.ic_add_shopping_cart_black_48dp);
         fab.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -76,7 +95,7 @@ public class MainScreen extends AppCompatActivity
             }
         });
 
-        DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
+        drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
         ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(
                 this, drawer, toolbar, R.string.navigation_drawer_open, R.string.navigation_drawer_close);
         drawer.addDrawerListener(toggle);
@@ -109,6 +128,9 @@ public class MainScreen extends AppCompatActivity
         listOfListsToDisplay = getListOfTablesToDisplay();
         chooseListSpinner = createSpinner();
 
+        mAuth = FirebaseAuth.getInstance();
+
+        Log.d("KeyHash:", "ЛЯЯЯЯЯЯЯЯЯЯЯЯЯЯЯЯЯЯЯЯЯЯЯЯЯЯЯЯЯ   " +  FacebookSdk.getApplicationSignature(getApplicationContext()));
 
     }
 
@@ -118,6 +140,7 @@ public class MainScreen extends AppCompatActivity
         shoppingList.add(0, product);
         rAdapterToDo.notifyItemInserted(0);
         dataListHolder.insert(product);
+        rViewToDo.scrollToPosition(0);
     }
     @Override  // here we get name of new list
     public void getListNameInput(String input) {
@@ -139,7 +162,7 @@ public class MainScreen extends AppCompatActivity
         setTitle(input);
         spinnerAdapter.notifyDataSetChanged();
     }
-    @Override
+    @Override   //getting user choice and update UI
     public void getUserChoice(String listNameToDisplay) {
         for (String key : mapOfLists.keySet()) {
             if (mapOfLists.get(key).equals(listNameToDisplay)) {
@@ -150,7 +173,6 @@ public class MainScreen extends AppCompatActivity
         setTitle(listNameToDisplay);
         renewViewOfMainScreen(listName);
         chooseListSpinner.setSelection(listOfListsToDisplay.indexOf(listNameToDisplay));
-        DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
         drawer.closeDrawer(GravityCompat.START);
     }
     @Override
@@ -205,7 +227,6 @@ public class MainScreen extends AppCompatActivity
 
     @Override
     public void onBackPressed() {
-        DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
         if (drawer.isDrawerOpen(GravityCompat.START)) {
             drawer.closeDrawer(GravityCompat.START);
         } else {
@@ -261,7 +282,13 @@ public class MainScreen extends AppCompatActivity
 
         } else if (id == R.id.nav_slideshow) {
 
-        } else if (id == R.id.help) {
+        } else if (id == R.id.log_out) {
+            if (drawer.isDrawerOpen(GravityCompat.START)) {
+                drawer.closeDrawer(GravityCompat.START);
+            }
+            Intent intent = new Intent(this, LoginActivity.class);
+            startActivityForResult(intent, LOGIN_RESULT);
+            return true;
 
         } else if (id == R.id.new_list) {
             new AddListDialog().show(getFragmentManager(), "AddListDialog");
@@ -275,10 +302,80 @@ public class MainScreen extends AppCompatActivity
     }
 
     @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        if (resultCode == RESULT_OK) {
+            switch (requestCode) {
+                case LOGIN_RESULT:{
+                    String userName = data.getStringExtra("userName");
+                    String userMail = data.getStringExtra("userMail");
+                    Uri userPic = data.getParcelableExtra("userPic");
+
+                    fillUserDatails(userName, userMail, userPic);
+                }
+            }
+        }else{
+            fillDefaultUserDatails();
+        }
+    }
+
+    private void fillDefaultUserDatails() {
+        ImageView userPicView = drawer.findViewById(R.id.imageView);
+        TextView userNameView = drawer.findViewById(R.id.user_name);
+        TextView userMailView = drawer.findViewById(R.id.user_mail);
+        userPicView.setImageResource(R.mipmap.ic_launcher_round);
+        userNameView.setText(R.string.app_name);
+        userMailView.setText(R.string.make_shopping_easier);
+    }
+
+    private void fillUserDatails(String userName, String userMail, Uri userPic) {
+        ImageView userPicView = drawer.findViewById(R.id.imageView);
+        TextView userNameView = drawer.findViewById(R.id.user_name);
+        TextView userMailView = drawer.findViewById(R.id.user_mail);
+        //Log.d("userName", "userName = null  " + (userName == null));
+        if (userName != null && !userName.equals("")) {
+            userNameView.setText(userName);
+        } else {
+            userNameView.setText(R.string.app_name);
+        }
+        if (userMail != null) {
+            userMailView.setText(userMail);
+        }else {
+            userMailView.setText(R.string.make_shopping_easier);
+        }
+
+        if (userPic != null) {
+            Picasso.get().load(userPic).transform(new CropCircleTransformation()).into(userPicView);
+        }else {
+            userPicView.setImageResource(R.mipmap.ic_launcher_round);
+        }
+    }
+
+    @Override
     protected void onPause() {  // need more tests
         super.onPause();
         // Remember data
        savePreferences();
+    }
+
+    @Override
+    public void onStart() {
+        super.onStart();
+        // Check if user is signed in (non-null) and update UI accordingly.
+        FirebaseUser currentUser = mAuth.getCurrentUser();
+        //updateUI(currentUser);
+    }
+
+    @Override
+    protected void onResume() {
+
+        super.onResume();
+    }
+
+    private void updateUI(FirebaseUser currentUser) {
+        if (currentUser != null) {
+            fillUserDatails(currentUser.getDisplayName(), currentUser.getEmail(), currentUser.getPhotoUrl());
+        }
     }
 
     @Override
@@ -338,7 +435,7 @@ public class MainScreen extends AppCompatActivity
         list.add(0, mapOfLists.get(listName));
         return list;
     }
-        // spinner will be deleted
+
     private Spinner createSpinner() {
         Spinner spinner = findViewById(R.id.spinner_list);
         spinnerAdapter = getSpinnerAdapter();
@@ -347,8 +444,6 @@ public class MainScreen extends AppCompatActivity
             @Override
             public void onItemSelected(AdapterView<?> adapterView, View view, int i, long l) {
                 getUserChoice(listOfListsToDisplay.get(i));
-//                DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
-//                drawer.closeDrawer(GravityCompat.START);
             }
 
             @Override
