@@ -45,6 +45,9 @@ import org.json.JSONObject;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
@@ -54,7 +57,8 @@ import jp.wasabeef.picasso.transformations.CropCircleTransformation;
 
 public class MainScreen extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener, AddDialog.OnTextInputListener, AddListDialog.OnListNameInputListener,
-        RenameListDialog.OnListListRenameListener, ChooseListDialog.OnChooseListListener, ModifyListDialog.OnModifyListListener {
+        RenameListDialog.OnListListRenameListener, ChooseListDialog.OnChooseListListener, ModifyListDialog.OnModifyListListener, ModifyItemDialog.OnItemModifyListener {
+    public static final String TAG = "MainActivity";
     public static final int LOGIN_RESULT = 2121;
     public static final String APP_PREFERENCES = "listsettings";
     public static final String APP_PREFERENCES_LIST_NAME = "listName";
@@ -76,6 +80,11 @@ public class MainScreen extends AppCompatActivity
     private ArrayAdapter<String> spinnerAdapter;
     private DrawerLayout drawer;
     private FirebaseAuth mAuth;
+
+    private ImageView userPicView;
+    private TextView userNameView;
+    private TextView userMailView;
+    private MenuItem logMenuItem;
 
 
     @Override
@@ -103,10 +112,12 @@ public class MainScreen extends AppCompatActivity
 
         NavigationView navigationView = (NavigationView) findViewById(R.id.nav_view);
         navigationView.setNavigationItemSelectedListener(this);
+        //logMenuItem = navigationView.getMenu().findItem(R.id.log_out);
         // end of template
         // start code
         mSettings = getSharedPreferences(APP_PREFERENCES, Context.MODE_PRIVATE);
         loadPreferences();
+        bindUserViews();
         setTitle(mapOfLists.get(listName));
         dataListHolder = new DataListHolder(MainScreen.this, listName);
         shoppingList = dataListHolder.getShoppingList();
@@ -130,10 +141,9 @@ public class MainScreen extends AppCompatActivity
 
         mAuth = FirebaseAuth.getInstance();
 
-        Log.d("KeyHash:", "ЛЯЯЯЯЯЯЯЯЯЯЯЯЯЯЯЯЯЯЯЯЯЯЯЯЯЯЯЯЯ   " +  FacebookSdk.getApplicationSignature(getApplicationContext()));
+        Log.d(TAG, "end of onCreate   " +  FacebookSdk.getApplicationSignature(getApplicationContext()));
 
     }
-
     @Override  // here we receive users input in Dialog and add it to shopping list
     public void getUserInput(String input, String quantity) {
         Product product = new Product(input, quantity, 0);
@@ -154,7 +164,7 @@ public class MainScreen extends AppCompatActivity
         chooseListSpinner.setSelection(0);
     }
 
-    @Override  // here we get NEW name of new list
+    @Override  // here we get NEW name of new list (AddListDialog)
     public void getNewListNameInput(String input) {
         listOfListsToDisplay.remove(mapOfLists.get(listName));
         listOfListsToDisplay.add(0, input);
@@ -162,7 +172,7 @@ public class MainScreen extends AppCompatActivity
         setTitle(input);
         spinnerAdapter.notifyDataSetChanged();
     }
-    @Override   //getting user choice and update UI
+    @Override   //getting user choice and update UI  (ChooseListDialog)
     public void getUserChoice(String listNameToDisplay) {
         for (String key : mapOfLists.keySet()) {
             if (mapOfLists.get(key).equals(listNameToDisplay)) {
@@ -175,7 +185,7 @@ public class MainScreen extends AppCompatActivity
         chooseListSpinner.setSelection(listOfListsToDisplay.indexOf(listNameToDisplay));
         drawer.closeDrawer(GravityCompat.START);
     }
-    @Override
+    @Override // from Modify List Dialog
     public void getUserConfirm(String option) {
             if (option.equals(getResources().getString(R.string.delete_list))) {
                 dataListHolder.deleteTable(listName);
@@ -211,6 +221,19 @@ public class MainScreen extends AppCompatActivity
                 rAdapterDone.notifyDataSetChanged();
                 dataListHolder.deleteAll();
                 return;
+        }
+    }
+
+    @Override
+    public void getItemModificationInput(String input, List<Product> product, int position) {
+        if (input == null) {
+            product.remove(position);
+            rAdapterToDo.notifyDataSetChanged();
+            rAdapterDone.notifyDataSetChanged();
+        } else {
+            product.get(position).setName(input);
+            rAdapterToDo.notifyDataSetChanged();
+            rAdapterDone.notifyDataSetChanged();
         }
     }
 
@@ -250,6 +273,15 @@ public class MainScreen extends AppCompatActivity
                 return true;
             case R.id.rename:
                 new RenameListDialog().show(getFragmentManager(), "RenameListDialog");
+                return true;
+            case R.id.sort_list:
+                Collections.sort(shoppingList, new Comparator<Product>() {
+                    @Override
+                    public int compare(Product o1, Product o2) {
+                        return o1.getName().compareToIgnoreCase(o2.getName());
+                    }
+                });
+                rAdapterToDo.notifyDataSetChanged();
                 return true;
             case R.id.delete:
                 modifyDialog = new ModifyListDialog();
@@ -296,7 +328,7 @@ public class MainScreen extends AppCompatActivity
             new ChooseListDialog().show(getFragmentManager(), "ChooseListDialog");
         }
 
-        DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
+        //DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
         drawer.closeDrawer(GravityCompat.START);
         return true;
     }
@@ -320,35 +352,30 @@ public class MainScreen extends AppCompatActivity
     }
 
     private void fillDefaultUserDatails() {
-        ImageView userPicView = drawer.findViewById(R.id.imageView);
-        TextView userNameView = drawer.findViewById(R.id.user_name);
-        TextView userMailView = drawer.findViewById(R.id.user_mail);
         userPicView.setImageResource(R.mipmap.ic_launcher_round);
         userNameView.setText(R.string.app_name);
         userMailView.setText(R.string.make_shopping_easier);
+        logMenuItem.setTitle(R.string.login);
     }
 
     private void fillUserDatails(String userName, String userMail, Uri userPic) {
-        ImageView userPicView = drawer.findViewById(R.id.imageView);
-        TextView userNameView = drawer.findViewById(R.id.user_name);
-        TextView userMailView = drawer.findViewById(R.id.user_mail);
-        //Log.d("userName", "userName = null  " + (userName == null));
+
         if (userName != null && !userName.equals("")) {
             userNameView.setText(userName);
         } else {
             userNameView.setText(R.string.app_name);
         }
-        if (userMail != null) {
+        if (userMail != null && !userMail.equals("")) {
             userMailView.setText(userMail);
         }else {
             userMailView.setText(R.string.make_shopping_easier);
         }
-
         if (userPic != null) {
             Picasso.get().load(userPic).transform(new CropCircleTransformation()).into(userPicView);
         }else {
             userPicView.setImageResource(R.mipmap.ic_launcher_round);
         }
+        logMenuItem.setTitle(R.string.logout);
     }
 
     @Override
@@ -363,7 +390,7 @@ public class MainScreen extends AppCompatActivity
         super.onStart();
         // Check if user is signed in (non-null) and update UI accordingly.
         FirebaseUser currentUser = mAuth.getCurrentUser();
-        //updateUI(currentUser);
+        updateUI(currentUser);
     }
 
     @Override
@@ -385,6 +412,20 @@ public class MainScreen extends AppCompatActivity
         //closing database connection
         dataListHolder.close();
         super.onDestroy();
+    }
+
+    private void bindUserViews() {
+        NavigationView mNavigationView = (NavigationView) findViewById(R.id.nav_view_header_only);
+        View mHeaderView = mNavigationView.getHeaderView(0);
+        NavigationView navMenuView = (NavigationView) findViewById(R.id.nav_view);
+        logMenuItem = navMenuView.getMenu().findItem(R.id.log_out);
+        userPicView = mHeaderView.findViewById(R.id.imageView);
+        userNameView = mHeaderView.findViewById(R.id.user_name);
+        userMailView = mHeaderView.findViewById(R.id.user_mail);
+
+        Log.d(TAG, "userPicView == null   " + (userPicView == null));
+        Log.d(TAG, "userNameView == null  " + (userNameView == null));
+        Log.d(TAG, "userMailView == null  " + (userMailView == null));
     }
 
     void savePreferences() {
@@ -460,5 +501,4 @@ public class MainScreen extends AppCompatActivity
         adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
         return adapter;
     }
-
 }

@@ -31,7 +31,9 @@
     <string name="shopping_list">Shopping list</string>
     <string name="make_shopping_easier">Make shopping easier!</string>
     <string name="delete_list">Delete list</string>
+    <string name="select_option">Select option</string>
     <string name="logout">Log out</string>
+    <string name="login">Log in</string>
     <string name="title_activity_login">Sign in</string>
 
     <string name="user_exists">User already logged in</string>
@@ -180,5 +182,8 @@
 
     <string name="facebook_app_id">159407041402897</string>
     <string name="fb_login_protocol_scheme">fb159407041402897</string>
+    <string name="change_product">Change product</string>
+    <string name="new_product_name">New product name</string>
+    <string name="sort_list">Sort list</string>
 
 </resources>

@@ -6,18 +6,20 @@
     android:id="@+id/rename_list">
 
     <TextView
-        android:id="@+id/head"
+        android:id="@+id/head_change_product"
         android:layout_width="match_parent"
         android:layout_height="60dp"
         android:background="@color/dialogBackground"
         android:textSize="10pt"
         android:textStyle="bold|italic"
         android:gravity="center"
-        android:text="@string/rename_list_header"
-        android:textColorLink="@color/colorAccent" />
+        android:text="@string/change_product"
+        android:textColorLink="@color/colorAccent"
+        android:paddingStart="40dp"
+        android:paddingEnd="40dp"/>
 
     <EditText
-        android:id="@+id/enter_list_name"
+        android:id="@+id/enter_product_name"
         android:layout_width="match_parent"
         android:layout_height="60dp"
         android:layout_marginBottom="6dp"
@@ -26,7 +28,7 @@
         android:layout_marginTop="4dp"
         android:fontFamily="sans-serif"
         android:gravity="center"
-        android:hint="@string/list_name"
+        android:hint="@string/new_product_name"
         android:inputType="textCapSentences"
         android:textSize="8pt">
     </EditText>
@@ -39,20 +41,27 @@
         >
 
         <Button
-            android:id="@+id/cancel_add_list_button"
+            android:id="@+id/delete_item"
             style="@style/Widget.AppCompat.Button.Borderless"
             android:layout_width="wrap_content"
             android:layout_height="60dp"
             android:layout_weight="1"
-            android:text="@string/cancel" />
+            android:text="@string/delete" />
 
         <Button
-            android:id="@+id/rename_list_button"
+            android:id="@+id/rename_item"
             style="@style/Widget.AppCompat.Button.Borderless"
             android:layout_width="wrap_content"
             android:layout_height="60dp"
             android:layout_weight="1"
-            android:text="@string/rename_list" />
+            android:text="@string/rename" />
     </LinearLayout>
+
+    <Button
+        android:id="@+id/cancel_add_item_button"
+        style="@style/Widget.AppCompat.Button.Borderless"
+        android:layout_width="match_parent"
+        android:layout_height="60dp"
+        android:text="@string/cancel" />
 
 </LinearLayout>

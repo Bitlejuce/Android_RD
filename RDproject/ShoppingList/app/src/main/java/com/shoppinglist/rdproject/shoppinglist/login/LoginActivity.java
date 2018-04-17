@@ -59,7 +59,6 @@ public class LoginActivity extends BaseActivity implements
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        //FacebookSdk.sdkInitialize(getApplicationContext());
         setContentView(R.layout.activity_login);
         getSupportActionBar().hide();
         bindViews();
@@ -124,7 +123,7 @@ public class LoginActivity extends BaseActivity implements
             emailEditText.setVisibility(View.GONE);
             passwordEditText.setVisibility(View.GONE);
             logoutButton.setVisibility(View.VISIBLE);
-                if (!currentUser.isEmailVerified() && currentUser.getEmail() != null) {
+                if (!currentUser.isEmailVerified() && currentUser.getEmail() != null && !currentUser.getEmail().equals("")) {
                     verifyEmail.setVisibility(View.VISIBLE);
                     verifyEmail.setEnabled(true);
                 } else {
@@ -213,8 +212,6 @@ public class LoginActivity extends BaseActivity implements
         String password;
         switch (view.getId()){
 //            case  R.id.facebook_login_button:
-//                facebookLoginHelper = new FacebookLoginHelper(this, mAuth, facebookLoginButton);
-//
 //                break;
             case  R.id.google_login_button:{
                 googleLoginHelper = new GoogleLoginHelper(this, mAuth);

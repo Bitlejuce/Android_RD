@@ -10,6 +10,7 @@ import android.view.View;
 import android.view.WindowManager;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.Toast;
 
 import com.shoppinglist.rdproject.shoppinglist.R;
 
@@ -22,7 +23,7 @@ public class AddListDialog extends DialogFragment {
     @Override
     public Dialog onCreateDialog(Bundle savedInstanceState) {
         AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
-        LayoutInflater inflater = getActivity().getLayoutInflater();
+        final LayoutInflater inflater = getActivity().getLayoutInflater();
         View dialogAddList = inflater.inflate(R.layout.add_list, null);
         inputListName = dialogAddList.findViewById(R.id.enter_list_name);
         add = dialogAddList.findViewById(R.id.add_list_button);
@@ -32,8 +33,12 @@ public class AddListDialog extends DialogFragment {
             @Override
             public void onClick(View view) {
                 String inputString = inputListName.getText().toString();
-                    onListNameInputListener.getListNameInput(inputString);
+                if (inputString.isEmpty()){
+                    inputListName.setError("Enter as least one symbol");
+                }else {
+                    onListNameInputListener.getListNameInput(inputString.trim());
                     getDialog().dismiss();
+                }
             }
         });
         cancel.setOnClickListener(new View.OnClickListener() {
