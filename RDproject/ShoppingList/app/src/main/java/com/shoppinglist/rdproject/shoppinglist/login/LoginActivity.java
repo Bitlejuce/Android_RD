@@ -1,7 +1,9 @@
 package com.shoppinglist.rdproject.shoppinglist.login;
 
 import android.app.Activity;
+import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.support.annotation.NonNull;
 import android.os.Bundle;
 import android.text.TextUtils;
@@ -18,6 +20,8 @@ import com.facebook.CallbackManager;
 import com.facebook.FacebookCallback;
 import com.facebook.FacebookException;
 import com.facebook.FacebookSdk;
+import com.facebook.GraphRequest;
+import com.facebook.GraphResponse;
 import com.facebook.login.LoginManager;
 import com.facebook.login.LoginResult;
 import com.facebook.login.widget.LoginButton;
@@ -32,8 +36,14 @@ import com.google.firebase.auth.AuthResult;
 import com.google.firebase.auth.FacebookAuthProvider;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
+import com.shoppinglist.rdproject.shoppinglist.MainScreen;
 import com.shoppinglist.rdproject.shoppinglist.R;
 import com.squareup.picasso.Picasso;
+
+import org.json.JSONException;
+import org.json.JSONObject;
+
+import static com.shoppinglist.rdproject.shoppinglist.MainScreen.APP_PREFERENCES;
 
 public class LoginActivity extends BaseActivity implements
         View.OnClickListener {
@@ -51,6 +61,7 @@ public class LoginActivity extends BaseActivity implements
     private LoginButton facebookLoginButton;
     private SignInButton googleLoginButton;
     private CallbackManager mCallbackManager;
+    private SharedPreferences mSettings;
 
     public void setCurrentUser(FirebaseUser currentUser) {
         this.currentUser = currentUser;
@@ -60,9 +71,13 @@ public class LoginActivity extends BaseActivity implements
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_login);
-        getSupportActionBar().hide();
+        //getSupportActionBar().hide();
+        setTitle(R.string.back_to_list);
+        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+        getSupportActionBar().setDisplayShowHomeEnabled(true);
         bindViews();
         setListeners();
+        mSettings = getSharedPreferences(APP_PREFERENCES, Context.MODE_PRIVATE);
         mAuth = FirebaseAuth.getInstance();
         currentUser = mAuth.getCurrentUser();
 
@@ -316,6 +331,11 @@ public class LoginActivity extends BaseActivity implements
         catch (NullPointerException e){
             //do nothing
         }
+        try {
+            removeUserMailFromPreferences();
+        } catch (Exception e) {
+            //do nothing
+        }
         refreshLayout();
     }
 
@@ -399,6 +419,44 @@ public class LoginActivity extends BaseActivity implements
                         hideProgressDialog();
                     }
                 });
+
+        GraphRequest request = GraphRequest.newMeRequest(
+                token,
+                new GraphRequest.GraphJSONObjectCallback() {
+                    @Override
+                    public void onCompleted(
+                            JSONObject object,
+                            GraphResponse response) {
+                        try {
+                            String userEmail = object.getString("email");
+                            saveUserMailToPreferences(userEmail);
+                            Log.d(TAG, userEmail);
+                        } catch (Exception e) {
+                            //do nothing
+                        }
+                    }
+                });
+        Bundle parameters = new Bundle();
+        parameters.putString("fields", "id,name,link,email");
+        request.setParameters(parameters);
+        request.executeAsync();
+    }
+
+    @Override
+    public boolean onSupportNavigateUp() {
+        onBackPressed();
+        return true;
+    }
+    private void saveUserMailToPreferences(String userEmail) {
+        SharedPreferences.Editor ed = mSettings.edit();
+        ed.putString(MainScreen.APP_PREFERENCES_USER_EMAIL, userEmail);
+        ed.apply();
+    }
+
+    private void removeUserMailFromPreferences() {
+        SharedPreferences.Editor ed = mSettings.edit();
+        ed.remove(MainScreen.APP_PREFERENCES_USER_EMAIL);
+        ed.apply();
     }
  }
 

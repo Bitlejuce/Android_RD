@@ -1,7 +1,9 @@
 package com.shoppinglist.rdproject.shoppinglist.login;
 
 import android.app.Activity;
+import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.support.annotation.NonNull;
 import android.util.Log;
 import android.widget.Toast;
@@ -17,7 +19,10 @@ import com.google.firebase.auth.FirebaseAuth;
 import com.google.android.gms.auth.api.signin.GoogleSignInClient;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.auth.GoogleAuthProvider;
+import com.shoppinglist.rdproject.shoppinglist.MainScreen;
 import com.shoppinglist.rdproject.shoppinglist.R;
+
+import static com.shoppinglist.rdproject.shoppinglist.MainScreen.APP_PREFERENCES;
 
 public class GoogleLoginHelper {
     private static final String TAG = "GoogleActivity";
@@ -25,6 +30,7 @@ public class GoogleLoginHelper {
     private FirebaseAuth mAuth;
     private LoginActivity activity;
     private GoogleSignInClient mGoogleSignInClient;
+    private SharedPreferences mSettings;
 
     public GoogleLoginHelper(Activity activity, FirebaseAuth mAuth) {
         this.mAuth = mAuth;
@@ -37,6 +43,7 @@ public class GoogleLoginHelper {
                 .build();
         // [END config_signin]
         mGoogleSignInClient = GoogleSignIn.getClient(activity, gso);
+        mSettings = activity.getSharedPreferences(APP_PREFERENCES, Context.MODE_PRIVATE);
 
     }
     // [START auth_with_google]
@@ -45,7 +52,8 @@ public class GoogleLoginHelper {
         // [START_EXCLUDE silent]
         activity.showProgressDialog();
         // [END_EXCLUDE]
-
+            String userEmail = acct.getEmail();
+            saveUserMailToPreferences(userEmail);
         AuthCredential credential = GoogleAuthProvider.getCredential(acct.getIdToken(), null);
         mAuth.signInWithCredential(credential)
                 .addOnCompleteListener(activity, new OnCompleteListener<AuthResult>() {
@@ -91,6 +99,12 @@ public class GoogleLoginHelper {
                         //activity.refreshLayout();
                     }
                 });
+    }
+
+    private void saveUserMailToPreferences(String userEmail) {
+        SharedPreferences.Editor ed = mSettings.edit();
+        ed.putString(MainScreen.APP_PREFERENCES_USER_EMAIL, userEmail);
+        ed.apply();
     }
 
 }

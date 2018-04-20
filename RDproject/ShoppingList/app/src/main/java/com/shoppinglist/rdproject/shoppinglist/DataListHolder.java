@@ -34,7 +34,7 @@ public class DataListHolder {
         ContentValues cv = new ContentValues();
         cv.put(COLUMN_NAME, product.getName());
         cv.put(DBHelper.COLUMN_QUANTITY, product.getQuantity());
-        cv.put(DBHelper.COLUMN_STATUS, DBHelper.STATUS_TODO);
+        cv.put(DBHelper.COLUMN_STATUS, product.getStatus());
         return shoppingListDB.insert(tableName, null, cv);
     }
 

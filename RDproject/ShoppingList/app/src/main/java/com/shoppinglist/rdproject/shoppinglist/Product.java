@@ -4,9 +4,9 @@ package com.shoppinglist.rdproject.shoppinglist;
 
 public class Product {
 
-        private String name;
-        private String quantity;
-        private int status;
+        public String name;
+        public String quantity;
+        public int status;
 
     public Product() {
     }
