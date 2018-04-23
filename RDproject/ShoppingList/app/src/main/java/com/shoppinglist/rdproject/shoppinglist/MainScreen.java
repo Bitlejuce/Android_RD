@@ -207,6 +207,7 @@ public class MainScreen extends AppCompatActivity
 
                 if (mapOfLists.isEmpty()) {
                     renewViewOfMainScreen("Newlist1");
+                    listName = "Newlist1";
                     setTitle("Newlist1");
                     mapOfLists.put("Newlist1", "Newlist1");
                     listOfListsToDisplay.add("Newlist1");
@@ -418,7 +419,9 @@ public class MainScreen extends AppCompatActivity
         super.onStart();
         // Check if user is signed in (non-null) and update UI accordingly.
         FirebaseUser currentUser = mAuth.getCurrentUser();
-        updateUI(currentUser);
+        if (currentUser != null) {
+            fillUserDatails(currentUser.getDisplayName(), currentUser.getEmail(), currentUser.getPhotoUrl());
+        }
         databaseInitialize(currentUser);
         Log.d(TAG, "onStart called");
     }
@@ -427,16 +430,6 @@ public class MainScreen extends AppCompatActivity
     protected void onResume() {
 
         super.onResume();
-    }
-
-    private void updateUI(FirebaseUser currentUser) {
-        if (currentUser != null) {
-            String currentUserEmail = currentUser.getEmail();
-            if (currentUserEmail == null || currentUserEmail.equals("")){
-                //currentUserEmail = FirebaseUser.getProviderData().getEmail();
-            }
-            fillUserDatails(currentUser.getDisplayName(), currentUser.getEmail(), currentUser.getPhotoUrl());
-        }
     }
 
     private void databaseInitialize(FirebaseUser currentUser){
