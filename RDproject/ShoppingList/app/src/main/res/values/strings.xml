@@ -4,6 +4,9 @@
     <string name="navigation_drawer_open">Open navigation drawer</string>
     <string name="navigation_drawer_close">Close navigation drawer</string>
     <string name="pic_description">pic_of_product</string>
+    <string name="admob_app_id">ca-app-pub-8462980126781299~7734683972</string>
+    <string name="admob_banner_id">ca-app-pub-8462980126781299/5410228378</string>
+
 
     <string name="action_settings">Settings</string>
     <string name="share">Start sharing</string>
@@ -90,8 +93,6 @@
     <string name="getting_data">Getting User Info…</string>
     <string name="password_mismatch">Make sure your passwords match</string>
     <string name="login_failed">Login failed! Try again!</string>
-
-
 
 
     <!-- Strings related to FireBase Authentication -->
@@ -186,5 +187,94 @@
     <string name="change_product">Change product</string>
     <string name="new_product_name">New product name</string>
     <string name="sort_list">Sort list</string>
+    <string name="options">Options</string>
+    <string name="sory_incorrect_key">Sorry this isn\'t correct key!</string>
+    <string name="cogratulation">Congratulation!</string>
+    <string name="secret_key">I love Roma</string>
+    <string name="guess_the_secret_phrase">Guess the secret phrase</string>
+    <string name="remove_ads">Remove banner</string>
+    <string name="title_activity_settings">Settings</string>
+
+    <!-- Strings related to Settings -->
+
+    <!-- Example General settings -->
+    <string name="pref_header_general">General</string>
+
+    <string name="pref_title_social_recommendations">Enable social recommendations</string>
+    <string name="pref_description_social_recommendations">Recommendations for people to contact
+        based on your message history
+    </string>
+
+    <string name="pref_title_display_name">Display name</string>
+    <string name="pref_default_display_name">John Smith</string>
+
+    <string name="chose_language">Language</string>
+    <string-array name="chose_language_array_titles">
+        <item>English</item>
+        <item>Русский</item>
+    </string-array>
+    <string-array name="chose_language_array_values">
+        <item>1</item>
+        <item>0</item>
+    </string-array>
+
+    <!-- Example settings for Data & Sync -->
+    <string name="pref_header_data_sync">Data &amp; sync</string>
+
+    <string name="pref_title_sync_frequency">Sync frequency</string>
+    <string-array name="pref_sync_frequency_titles">
+        <item>15 minutes</item>
+        <item>30 minutes</item>
+        <item>1 hour</item>
+        <item>3 hours</item>
+        <item>6 hours</item>
+        <item>Never</item>
+    </string-array>
+    <string-array name="pref_sync_frequency_values">
+        <item>15</item>
+        <item>30</item>
+        <item>60</item>
+        <item>180</item>
+        <item>360</item>
+        <item>-1</item>
+    </string-array>
+
+    <string-array name="list_preference_entries">
+        <item>Entry 1</item>
+        <item>Entry 2</item>
+        <item>Entry 3</item>
+    </string-array>
+
+    <string-array name="list_preference_entry_values">
+        <item>1</item>
+        <item>2</item>
+        <item>3</item>
+    </string-array>
+
+    <string-array name="multi_select_list_preference_default_value" />
+
+    <string name="pref_title_system_sync_settings">System sync settings</string>
+
+    <!-- Example settings for Notifications -->
+    <string name="pref_header_notifications">Notifications</string>
+
+    <string name="pref_title_new_message_notifications">New message notifications</string>
+
+    <string name="pref_title_ringtone">Ringtone</string>
+    <string name="pref_ringtone_silent">Silent</string>
+
+    <string name="pref_title_vibrate">Vibrate</string>
+    <string name="choose_language_sumary">Choose you language</string>
+    <string name="pref_title_block_screen">Disable auto lock screen</string>
+    <string name="pref_log_out_on_exit">Log out on exit</string>
+    <string name="remove_ads_completely">Remove ads completely</string>
+    <string name="app_version">2.11</string>
+    <string name="title_version">Version</string>
+    <string name="contact_us">Contact</string>
+    <string name="watch_ads_video">Watch ads video</string>
+    <string name="to_remove_ads_for24">Remove banner for 24 hours</string>
+    <string name="send_email">Send email...</string>
+    <string name="banner_not_border">Congratulations banner will not border you!</string>
+
 
 </resources>

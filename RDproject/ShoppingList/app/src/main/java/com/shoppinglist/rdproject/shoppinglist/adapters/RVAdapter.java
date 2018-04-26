@@ -14,8 +14,12 @@ import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.TextView;
 
+import com.google.android.gms.ads.AdRequest;
+import com.google.android.gms.ads.AdSize;
+import com.google.android.gms.ads.AdView;
 import com.shoppinglist.rdproject.shoppinglist.DBHelper;
 import com.shoppinglist.rdproject.shoppinglist.DataListHolder;
+import com.shoppinglist.rdproject.shoppinglist.MainScreen;
 import com.shoppinglist.rdproject.shoppinglist.Product;
 import com.shoppinglist.rdproject.shoppinglist.R;
 import com.shoppinglist.rdproject.shoppinglist.dialogs.ModifyItemDialog;
@@ -23,8 +27,10 @@ import com.shoppinglist.rdproject.shoppinglist.dialogs.ModifyItemDialog;
 import java.util.List;
 
 
-public class RVAdapter extends RecyclerView.Adapter<RVAdapter.ProductViewHolder>{
+public class RVAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder>{
 
+    private static final int AD_TYPE = 101;
+    private static final int CONTENT_TYPE = 202;
     private List<Product> product;
     private int layoutId;
     private Activity context;
@@ -40,41 +46,76 @@ public class RVAdapter extends RecyclerView.Adapter<RVAdapter.ProductViewHolder>
         this.dataListHolder = dataListHolder;
     }
     @Override
-    public ProductViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
-        CardView v = (CardView)LayoutInflater.from(parent.getContext()).inflate(R.layout.item, parent, false);
+    public  RecyclerView.ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
+        if (viewType == AD_TYPE){
+            View  v = LayoutInflater.from(parent.getContext()).inflate(R.layout.ads_banner_layout, parent, false);
+            return new AdsViewHolder(v);
+        } else {
 
-        switch (layoutId) {
-            case R.id.lis_to_do: {
-                 v.setCardBackgroundColor(context.getResources().getColor(R.color.cardBackground));
-                 return new ProductViewHolder(v);
+            CardView v = (CardView) LayoutInflater.from(parent.getContext()).inflate(R.layout.item, parent, false);
+
+            switch (layoutId) {
+                case R.id.lis_to_do: {
+                    v.setCardBackgroundColor(context.getResources().getColor(R.color.cardBackground));
+                    return new ProductViewHolder(v);
+                }
+                case R.id.list_done: {
+                    v.setCardBackgroundColor(context.getResources().getColor(R.color.cardview_dark_background));
+                }
             }
-            case R.id.list_done: {
-                v.setCardBackgroundColor(context.getResources().getColor(R.color.cardview_dark_background));
-            }
-        }
             return new ProductViewHolder(v);
+        }
     }
     @Override
-    public void onBindViewHolder(ProductViewHolder holder, int i) {
+    public void onBindViewHolder(RecyclerView.ViewHolder holder, int i) {
+        switch (holder.getItemViewType()) {
+            case AD_TYPE:
+                AdsViewHolder adsViewHolder = (AdsViewHolder) holder;
+                AdRequest request = new AdRequest.Builder().addTestDevice("3361271BC77BB2DAE797507DFCF9F45A").build();
+                adsViewHolder.mAdView.loadAd(request);
+                break;
+
+            case CONTENT_TYPE:
+                ProductViewHolder productViewHolder = (ProductViewHolder) holder;
                 String name = product.get(i).getName();
-                holder.productName.setText(name);
-                holder.productQty.setText(product.get(i).getQuantity());
-                holder.productPhoto.setText(name.substring(0,1).toUpperCase());
+                productViewHolder.productName.setText(name);
+                productViewHolder.productQty.setText(product.get(i).getQuantity());
+                productViewHolder.productPhoto.setText(name.substring(0, 1).toUpperCase());
+            }
         }
+
+    @Override
+    public int getItemViewType(int position)
+    {
+        if (MainScreen.isAdsfree ) return CONTENT_TYPE;
+
+        if (position == 5) {
+            return AD_TYPE;
+        }
+        return CONTENT_TYPE;
+    }
 
     @Override
     public int getItemCount() {
         return product.size();
     }
 
+    public class AdsViewHolder extends RecyclerView.ViewHolder {
+        AdView mAdView;
+        public AdsViewHolder(View itemView) {
+            super(itemView);
+            mAdView = (AdView)itemView.findViewById(R.id.adView);
+        }
+
+    }
     public class ProductViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener, AdapterView.OnLongClickListener {
-        CardView cv;
+        View cv;
         TextView productName;
         TextView productQty;
         TextView productPhoto;
         ProductViewHolder(View itemView) {
             super(itemView);
-            cv = (CardView)itemView; //(CardView)itemView.findViewById(R.id.item);
+            cv = itemView; //(CardView)itemView.findViewById(R.id.item);
             productName = (TextView)itemView.findViewById(R.id.product_name);
             productQty = (TextView)itemView.findViewById(R.id.quantity);
             productPhoto = (TextView)itemView.findViewById(R.id.pic_of_the_product);

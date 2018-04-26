@@ -1,6 +1,9 @@
 package com.shoppinglist.rdproject.shoppinglist;
 
+import android.app.Activity;
+import android.app.KeyguardManager;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.pm.PackageInfo;
@@ -9,6 +12,8 @@ import android.content.pm.Signature;
 import android.media.audiofx.BassBoost;
 import android.net.Uri;
 import android.os.Bundle;
+import android.os.PowerManager;
+import android.preference.PreferenceManager;
 import android.provider.Settings;
 import android.support.annotation.NonNull;
 import android.support.design.widget.FloatingActionButton;
@@ -16,6 +21,7 @@ import android.support.design.widget.NavigationView;
 import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarDrawerToggle;
+import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
@@ -25,14 +31,17 @@ import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.view.WindowManager;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
+import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
 
 import com.facebook.FacebookSdk;
+import com.google.android.gms.ads.AdView;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.database.DatabaseReference;
@@ -68,6 +77,11 @@ public class MainScreen extends AppCompatActivity
     public static final String APP_PREFERENCES_LIST_NAME = "listName";
     public static final String APP_PREFERENCES_MAP_OF_LISTS = "mapOfLists";
     public static final String APP_PREFERENCES_USER_EMAIL = "userEmail";
+    public static final String APP_PREFERENCES_IS_ADS_FREE = "isAdsfree";
+    public static final String ADMOB_APP_ID = "ca-app-pub-8462980126781299~7734683972";
+    public static final String ADMOB_BANNER_ID = "ca-app-pub-8462980126781299/5410228378";
+    public static boolean isAdsfree = false;
+    public static long timeForRemovingBanner = 0;
     public String userId;
     private SharedPreferences mSettings;
     private RecyclerView rViewToDo;
@@ -144,6 +158,7 @@ public class MainScreen extends AppCompatActivity
         rViewDone.setLayoutManager(rLayoutManagerDone);
         rAdapterDone = new RVAdapter(this, doneList, R.id.list_done, dataListHolder);
         rViewDone.setAdapter(rAdapterDone);
+
         listOfListsToDisplay = getListOfTablesToDisplay();
         chooseListSpinner = createSpinner();
         //Firebase ini
@@ -330,11 +345,37 @@ public class MainScreen extends AppCompatActivity
 
     @Override
     public boolean onNavigationItemSelected(MenuItem item) {
-        // Handle navigation view item clicks here.
+
         int id = item.getItemId();
 
-        if (id == R.id.nav_camera) {
-            // Handle the action
+        if (id == R.id.nav_settings) {
+//            final EditText inputSecretKey = new EditText(this);
+//            inputSecretKey.setHint(R.string.guess_the_secret_phrase);
+//            inputSecretKey.setTextAlignment(View.TEXT_ALIGNMENT_CENTER);
+//
+//            new AlertDialog.Builder(this)
+//                    .setView(inputSecretKey)
+//                    .setPositiveButton(R.string.ok_button, new DialogInterface.OnClickListener() {
+//                        public void onClick(DialogInterface dialog, int whichButton) {
+//                            String inputAdsRemover = inputSecretKey.getText().toString().trim();
+//                            if (inputAdsRemover.equalsIgnoreCase(getResources().getString(R.string.secret_key))){
+//                                isAdsfree = true;
+//                                Toast.makeText(MainScreen.this, R.string.cogratulation, Toast.LENGTH_SHORT).show();
+//                                adsRemoveMenuItem.setVisible(false);
+//                                drawer.closeDrawer(GravityCompat.START);
+//                            }else {
+//                                Toast.makeText(MainScreen.this, R.string.sory_incorrect_key, Toast.LENGTH_SHORT).show();
+//                                drawer.closeDrawer(GravityCompat.START);
+//                            }
+//                        }
+//                    })
+//                    .setNegativeButton(R.string.cancel, new DialogInterface.OnClickListener() {
+//                        public void onClick(DialogInterface dialog, int whichButton) {
+//                        }
+//                    })
+//                    .show();
+            startActivityForResult(new Intent(MainScreen.this, SettingsActivity.class), 0);
+            return true;
         } else if (id == R.id.nav_gallery) {
 
         } else if (id == R.id.nav_slideshow) {
@@ -381,6 +422,9 @@ public class MainScreen extends AppCompatActivity
         userNameView.setText(R.string.app_name);
         userMailView.setText(R.string.make_shopping_easier);
         logMenuItem.setTitle(R.string.login);
+//        if (isAdsfree) adsRemoveMenuItem.setVisible(false);
+//        else adsRemoveMenuItem.setVisible(true);
+
     }
 
     private void fillUserDatails(String userName, String userMail, Uri userPic) {
@@ -405,6 +449,8 @@ public class MainScreen extends AppCompatActivity
             userPicView.setImageResource(R.mipmap.ic_launcher_round);
         }
         logMenuItem.setTitle(R.string.logout);
+//        if (isAdsfree) adsRemoveMenuItem.setVisible(false);
+//        else adsRemoveMenuItem.setVisible(true);
     }
 
     @Override
@@ -428,8 +474,17 @@ public class MainScreen extends AppCompatActivity
 
     @Override
     protected void onResume() {
-
+        preferenceChecker();
         super.onResume();
+    }
+
+    private void preferenceChecker() {
+        SharedPreferences sp = PreferenceManager.getDefaultSharedPreferences(this);
+        if (sp.getBoolean("lock_screen", false)) {
+            getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
+        }else {
+            getWindow().addFlags(WindowManager.LayoutParams.FLAG_ALLOW_LOCK_WHILE_SCREEN_ON);
+        }
     }
 
     private void databaseInitialize(FirebaseUser currentUser){
@@ -473,6 +528,10 @@ public class MainScreen extends AppCompatActivity
         savePreferences();
         //closing database connection
         dataListHolder.close();
+
+        if (PreferenceManager.getDefaultSharedPreferences(this).getBoolean("log_out_on_exit", false) && mAuth.getCurrentUser() != null){
+            mAuth.signOut();
+        }
         super.onDestroy();
     }
 
@@ -490,6 +549,7 @@ public class MainScreen extends AppCompatActivity
         SharedPreferences.Editor ed = mSettings.edit();
         ed.putString(APP_PREFERENCES_LIST_NAME, listName);
         ed.putString(APP_PREFERENCES_MAP_OF_LISTS, saveMapToString(mapOfLists));
+        ed.putBoolean(APP_PREFERENCES_IS_ADS_FREE, isAdsfree);
         ed.apply();
     }
 
@@ -498,6 +558,7 @@ public class MainScreen extends AppCompatActivity
             listName = mSettings.getString(APP_PREFERENCES_LIST_NAME, "");
             String savedMap = mSettings.getString(APP_PREFERENCES_MAP_OF_LISTS, "");
             mapOfLists = getSavedMap(savedMap);
+            isAdsfree = mSettings.getBoolean(APP_PREFERENCES_IS_ADS_FREE, false);
             Log.d("TEST", listName);
         }
         else {
@@ -505,6 +566,7 @@ public class MainScreen extends AppCompatActivity
             mapOfLists = new HashMap<>();
             mapOfLists.put(listName, listName);
         }
+        preferenceChecker();
     }
     private Map<String, String> getSavedMap(String mapSavedToString) {
         Map<String, String> map = new HashMap<>();
