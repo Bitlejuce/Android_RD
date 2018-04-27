@@ -81,7 +81,7 @@ public class MainScreen extends AppCompatActivity
     public static final String ADMOB_APP_ID = "ca-app-pub-8462980126781299~7734683972";
     public static final String ADMOB_BANNER_ID = "ca-app-pub-8462980126781299/5410228378";
     public static boolean isAdsfree = false;
-    public static long timeForRemovingBanner = 0;
+    public static boolean isAdsfreeForNow = false;
     public String userId;
     private SharedPreferences mSettings;
     private RecyclerView rViewToDo;
@@ -137,9 +137,11 @@ public class MainScreen extends AppCompatActivity
         //logMenuItem = navigationView.getMenu().findItem(R.id.log_out);
         // end of template
         // start code
+        isAdsfreeForNow = false;
         mSettings = getSharedPreferences(APP_PREFERENCES, Context.MODE_PRIVATE);
         loadPreferences();
         bindUserViews();
+
         setTitle(mapOfLists.get(listName));
         dataListHolder = new DataListHolder(MainScreen.this, listName);
         shoppingList = dataListHolder.getShoppingList();
@@ -349,31 +351,6 @@ public class MainScreen extends AppCompatActivity
         int id = item.getItemId();
 
         if (id == R.id.nav_settings) {
-//            final EditText inputSecretKey = new EditText(this);
-//            inputSecretKey.setHint(R.string.guess_the_secret_phrase);
-//            inputSecretKey.setTextAlignment(View.TEXT_ALIGNMENT_CENTER);
-//
-//            new AlertDialog.Builder(this)
-//                    .setView(inputSecretKey)
-//                    .setPositiveButton(R.string.ok_button, new DialogInterface.OnClickListener() {
-//                        public void onClick(DialogInterface dialog, int whichButton) {
-//                            String inputAdsRemover = inputSecretKey.getText().toString().trim();
-//                            if (inputAdsRemover.equalsIgnoreCase(getResources().getString(R.string.secret_key))){
-//                                isAdsfree = true;
-//                                Toast.makeText(MainScreen.this, R.string.cogratulation, Toast.LENGTH_SHORT).show();
-//                                adsRemoveMenuItem.setVisible(false);
-//                                drawer.closeDrawer(GravityCompat.START);
-//                            }else {
-//                                Toast.makeText(MainScreen.this, R.string.sory_incorrect_key, Toast.LENGTH_SHORT).show();
-//                                drawer.closeDrawer(GravityCompat.START);
-//                            }
-//                        }
-//                    })
-//                    .setNegativeButton(R.string.cancel, new DialogInterface.OnClickListener() {
-//                        public void onClick(DialogInterface dialog, int whichButton) {
-//                        }
-//                    })
-//                    .show();
             startActivityForResult(new Intent(MainScreen.this, SettingsActivity.class), 0);
             return true;
         } else if (id == R.id.nav_gallery) {
@@ -449,8 +426,6 @@ public class MainScreen extends AppCompatActivity
             userPicView.setImageResource(R.mipmap.ic_launcher_round);
         }
         logMenuItem.setTitle(R.string.logout);
-//        if (isAdsfree) adsRemoveMenuItem.setVisible(false);
-//        else adsRemoveMenuItem.setVisible(true);
     }
 
     @Override
@@ -463,17 +438,19 @@ public class MainScreen extends AppCompatActivity
     @Override
     public void onStart() {
         super.onStart();
-        // Check if user is signed in (non-null) and update UI accordingly.
+
         FirebaseUser currentUser = mAuth.getCurrentUser();
         if (currentUser != null) {
             fillUserDatails(currentUser.getDisplayName(), currentUser.getEmail(), currentUser.getPhotoUrl());
         }
         databaseInitialize(currentUser);
-        Log.d(TAG, "onStart called");
+        Log.d(TAG, "onStart called   isAdsfree = " + isAdsfree +"  isAdsfreeForNow =   " + isAdsfreeForNow);
     }
 
     @Override
     protected void onResume() {
+        rAdapterToDo.notifyDataSetChanged();
+        rAdapterDone.notifyDataSetChanged();
         preferenceChecker();
         super.onResume();
     }
@@ -515,9 +492,11 @@ public class MainScreen extends AppCompatActivity
 
             // add current list to Firebase
             for ( Product product : shoppingList){
+                if (product != null)
                 databaseRef.child(mapOfLists.get(listName)).child(product.getName()).setValue(product);
             }
             for ( Product product : doneList){
+                if (product != null)
                 databaseRef.child(mapOfLists.get(listName)).child(product.getName()).setValue(product);
         }
     }

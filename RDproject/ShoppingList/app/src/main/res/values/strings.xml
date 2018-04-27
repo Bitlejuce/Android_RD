@@ -275,6 +275,8 @@
     <string name="to_remove_ads_for24">Remove banner for 24 hours</string>
     <string name="send_email">Send email...</string>
     <string name="banner_not_border">Congratulations banner will not border you!</string>
+    <string name="nice_try">Nice try!</string>
+    <string name="to_remove_ads_for_now">Remove banner for now</string>
 
 
 </resources>

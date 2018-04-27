@@ -40,6 +40,7 @@ public class RVAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder>{
     }
 
     public RVAdapter(Activity context, List<Product> product, int layoutId, DataListHolder dataListHolder){
+
         this.product = product;
         this.layoutId = layoutId;
         this.context = context;
@@ -87,7 +88,7 @@ public class RVAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder>{
     @Override
     public int getItemViewType(int position)
     {
-        if (MainScreen.isAdsfree ) return CONTENT_TYPE;
+        if (MainScreen.isAdsfree || MainScreen.isAdsfreeForNow) return CONTENT_TYPE;
 
         if (position == 5) {
             return AD_TYPE;
@@ -97,8 +98,22 @@ public class RVAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder>{
 
     @Override
     public int getItemCount() {
+//        if (product.size()>5 && !MainScreen.isAdsfree){
+//            return product.size() + 1;
+//        }
         return product.size();
     }
+
+//    private int getRealPosition(int position) {
+//        if (MainScreen.isAdsfree) {
+//            return position;
+//        } else {
+//            if (getItemViewType(position) == CONTENT_TYPE && position > 5){
+//            return position -1;
+//        }
+//            return position;
+//        }
+//    }
 
     public class AdsViewHolder extends RecyclerView.ViewHolder {
         AdView mAdView;

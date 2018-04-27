@@ -22,11 +22,20 @@ import android.preference.RingtonePreference;
 import android.text.TextUtils;
 import android.util.Log;
 import android.view.MenuItem;
+import android.widget.Toast;
+
+import com.google.android.gms.ads.AdRequest;
+import com.google.android.gms.ads.MobileAds;
+import com.google.android.gms.ads.reward.RewardItem;
+import com.google.android.gms.ads.reward.RewardedVideoAd;
+import com.google.android.gms.ads.reward.RewardedVideoAdListener;
 
 import java.util.List;
 
 public class SettingsActivity extends AppCompatPreferenceActivity {
-
+    public static final String ADMOB_VIDEO_ID = "ca-app-pub-8462980126781299/7163924058";
+    public static final String ADMOB_TEST_VIDEO_ID = "ca-app-pub-3940256099942544/5224354917";
+    private static RewardedVideoAd mRewardedVideoAd;
     /**
      * A preference value change listener that updates the preference's summary
      * to reflect its new value.
@@ -101,9 +110,76 @@ public class SettingsActivity extends AppCompatPreferenceActivity {
         super.onCreate(savedInstanceState);
         setTitle(R.string.action_settings);
         setupActionBar();
+        MobileAds.initialize(this, ADMOB_TEST_VIDEO_ID);
+        mRewardedVideoAd = MobileAds.getRewardedVideoAdInstance(this);
+        mRewardedVideoAd.setRewardedVideoAdListener(new RewardedVideoAdListener() {
+            @Override
+            public void onRewardedVideoAdLoaded() {
+
+            }
+
+            @Override
+            public void onRewardedVideoAdOpened() {
+
+            }
+
+            @Override
+            public void onRewardedVideoStarted() {
+
+            }
+
+            @Override
+            public void onRewardedVideoAdClosed() {
+                Toast.makeText(SettingsActivity.this, "Sorry you must watch full video!", Toast.LENGTH_SHORT).show();
+            }
+
+            @Override
+            public void onRewarded(RewardItem rewardItem) {
+
+            }
+
+            @Override
+            public void onRewardedVideoAdLeftApplication() {
+
+            }
+
+            @Override
+            public void onRewardedVideoAdFailedToLoad(int i) {
+
+            }
+
+            @Override
+            public void onRewardedVideoCompleted() {
+                Toast.makeText(SettingsActivity.this, "Thank you!", Toast.LENGTH_SHORT).show();
+                MainScreen.isAdsfreeForNow = true;
+            }
+        });
+        loadRewardedVideoAd();
         getFragmentManager().beginTransaction().replace(android.R.id.content, new GeneralPreferenceFragment()).commit();
     }
 
+    @Override
+    public void onResume() {
+        mRewardedVideoAd.resume(this);
+        super.onResume();
+    }
+
+    @Override
+    public void onPause() {
+        mRewardedVideoAd.pause(this);
+        super.onPause();
+    }
+
+    @Override
+    public void onDestroy() {
+        mRewardedVideoAd.destroy(this);
+        super.onDestroy();
+    }
+
+    private static void loadRewardedVideoAd() {
+        mRewardedVideoAd.loadAd(ADMOB_TEST_VIDEO_ID,
+                new AdRequest.Builder().build());
+    }
     /**
      * Set up the {@link android.app.ActionBar}, if the API is available.
      */
@@ -116,7 +192,6 @@ public class SettingsActivity extends AppCompatPreferenceActivity {
 
         }
     }
-
     /**
      * {@inheritDoc}
      */
@@ -146,6 +221,7 @@ public class SettingsActivity extends AppCompatPreferenceActivity {
 
             bindPreferenceSummaryToValue(findPreference("language_settings"));
 
+            //handle contact preference
             Preference contactPref = findPreference(getResources().getString(R.string.contact_us));
             contactPref.setOnPreferenceClickListener(new Preference.OnPreferenceClickListener() {
                 @Override
@@ -171,11 +247,10 @@ public class SettingsActivity extends AppCompatPreferenceActivity {
                 }
             });
 
+            //handle remove ads option
             EditTextPreference removeAdsCompletely = (EditTextPreference) findPreference(getResources().getString(R.string.secret_key));
-//            Log.d("REMOVE_ADS", "removeAdsCompletely.getText() = " + removeAdsCompletely.getText()
-//                    + "    real key =  " + getResources().getString(R.string.secret_key)
-//                    + "  " + (removeAdsCompletely.getText().equalsIgnoreCase(getResources().getString(R.string.secret_key))));
-            if (removeAdsCompletely.getText().trim().equalsIgnoreCase(getResources().getString(R.string.secret_key))) {
+
+            if (removeAdsCompletely.getText()!= null && removeAdsCompletely.getText().trim().equalsIgnoreCase(getResources().getString(R.string.secret_key))) {
                 removeAdsCompletely.setEnabled(false);
             } else {
                 removeAdsCompletely.setOnPreferenceChangeListener(new Preference.OnPreferenceChangeListener() {
@@ -189,12 +264,30 @@ public class SettingsActivity extends AppCompatPreferenceActivity {
                             Snackbar.make(getView(), R.string.banner_not_border, Snackbar.LENGTH_LONG)
                                     .setAction("Action", null).show();
                             return true;
+                        }else {
+                            Snackbar.make(getView(), R.string.nice_try, Snackbar.LENGTH_LONG)
+                                    .setAction("Action", null).show();
+                            return false;
                         }
-                        Log.d("REMOVE_ADS", "secretKey = " + secretKey + "    real key =  " + realKey + "  " + secretKey.equalsIgnoreCase(realKey));
-                        return false;
+
                     }
                 });
             }
+            //handle remove ads for now
+            Preference removeAds24 = findPreference(getResources().getString(R.string.remove_ads));
+            removeAds24.setOnPreferenceClickListener(new Preference.OnPreferenceClickListener() {
+                @Override
+                public boolean onPreferenceClick(Preference preference) {
+                    if (mRewardedVideoAd.isLoaded()) {
+                        mRewardedVideoAd.show();
+                    }
+                    return true;
+                }
+            });
+
+
         }
+
+
     }
 }

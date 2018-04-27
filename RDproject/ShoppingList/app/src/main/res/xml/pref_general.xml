@@ -31,8 +31,10 @@
         android:title="@string/remove_ads_completely" />
 
     <Preference
-        android:summary="@string/to_remove_ads_for24"
-        android:title="@string/watch_ads_video" />
+        android:defaultValue="false"
+        android:summary="@string/to_remove_ads_for_now"
+        android:title="@string/watch_ads_video"
+        android:key="@string/remove_ads"/>
 
     <Preference
         android:title="@string/contact_us"
