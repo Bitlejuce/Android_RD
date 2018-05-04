@@ -1,18 +1,10 @@
 package com.shoppinglist.rdproject.shoppinglist;
 
-import android.app.Activity;
-import android.app.KeyguardManager;
 import android.content.Context;
-import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
-import android.content.pm.PackageInfo;
-import android.content.pm.PackageManager;
-import android.content.pm.Signature;
-import android.media.audiofx.BassBoost;
 import android.net.Uri;
 import android.os.Bundle;
-import android.os.PowerManager;
 import android.preference.PreferenceManager;
 import android.provider.Settings;
 import android.support.annotation.NonNull;
@@ -21,12 +13,10 @@ import android.support.design.widget.NavigationView;
 import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarDrawerToggle;
-import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
-import android.util.Base64;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -34,31 +24,29 @@ import android.view.View;
 import android.view.WindowManager;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
-import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
 
 import com.facebook.FacebookSdk;
-import com.google.android.gms.ads.AdView;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.database.ChildEventListener;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.ValueEventListener;
 import com.shoppinglist.rdproject.shoppinglist.adapters.RVAdapter;
 import com.shoppinglist.rdproject.shoppinglist.dialogs.*;
 import com.shoppinglist.rdproject.shoppinglist.login.LoginActivity;
-import com.shoppinglist.rdproject.shoppinglist.login.UserForRealtimeDatabase;
 import com.squareup.picasso.Picasso;
 
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import java.security.MessageDigest;
-import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashMap;
@@ -181,7 +169,10 @@ public class MainScreen extends AppCompatActivity
     }
     @Override  // here we get name of new list
     public void getListNameInput(String input) {
-        String newTableName = "Newlist" + (dataListHolder.getMaxIndexOfTable() + 1);
+        if (mapOfLists.containsValue(input)) {
+            return;
+        }
+        String newTableName = "Newlist" + (dataListHolder.getNextIndexOfTable());
         this.listName = newTableName;
         mapOfLists.put(newTableName, input);
         setTitle(input);
@@ -442,8 +433,10 @@ public class MainScreen extends AppCompatActivity
         FirebaseUser currentUser = mAuth.getCurrentUser();
         if (currentUser != null) {
             fillUserDatails(currentUser.getDisplayName(), currentUser.getEmail(), currentUser.getPhotoUrl());
+            //userId =  currentUser.getUid();
         }
         databaseInitialize(currentUser);
+      //  getRealtimeDataFromFirebase();
         Log.d(TAG, "onStart called   isAdsfree = " + isAdsfree +"  isAdsfreeForNow =   " + isAdsfreeForNow);
     }
 
@@ -464,41 +457,84 @@ public class MainScreen extends AppCompatActivity
         }
     }
 
-    private void databaseInitialize(FirebaseUser currentUser){
+    private void databaseInitialize(FirebaseUser currentUser) {
         databaseRef = database.getReference("Users").child(userId);
         String userName = null;
         String userMail = null;
-            if (currentUser != null) {
-                userName = currentUser.getDisplayName();
-                if (userName == null || userName.equals("")) {
-                    userName = "NoNameUser";
-                }
-                userMail = currentUser.getEmail();
-                if (userMail == null || userMail.equals("")) {
-                    try {
-                        userMail = mSettings.getString(APP_PREFERENCES_USER_EMAIL, getResources().getString(R.string.make_shopping_easier));
-                    }catch (Exception e){
-                        // do nothing
-                    }
+        if (currentUser != null) {
+            userName = currentUser.getDisplayName();
+            if (userName == null || userName.equals("")) {
+                userName = "NoNameUser";
+            }
+            userMail = currentUser.getEmail();
+            if (userMail == null || userMail.equals("")) {
+                try {
+                    userMail = mSettings.getString(APP_PREFERENCES_USER_EMAIL, getResources().getString(R.string.make_shopping_easier));
+                } catch (Exception e) {
+                    // do nothing
                 }
             }
-           // databaseRef.child(userId).setValue(new UserForRealtimeDatabase(userName, userMail));
-
-        Map<String, Object> updates = new HashMap<String,Object>();
+        }
+        Map<String, Object> updates = new HashMap<String, Object>();
         updates.put("email", userMail);
         updates.put("name", userName);
 
         databaseRef.updateChildren(updates);
 
-            // add current list to Firebase
-            for ( Product product : shoppingList){
-                if (product != null)
-                databaseRef.child(mapOfLists.get(listName)).child(product.getName()).setValue(product);
-            }
-            for ( Product product : doneList){
-                if (product != null)
+        // add current list to Firebase
+        for (Product product : shoppingList) {
+            if (product != null)
                 databaseRef.child(mapOfLists.get(listName)).child(product.getName()).setValue(product);
         }
+        for (Product product : doneList) {
+            if (product != null)
+                databaseRef.child(mapOfLists.get(listName)).child(product.getName()).setValue(product);
+        }
+    }
+
+    private void getRealtimeDataFromFirebase() {
+        // retrieve lists from Firebase
+        databaseRef.addValueEventListener(new ValueEventListener() {
+            @Override
+            public void onDataChange(DataSnapshot dataSnapshot) {
+                Log.d(TAG, "data is changed");
+                for (DataSnapshot listNameSnapshot : dataSnapshot.getChildren()) {
+                    String fireListName = listNameSnapshot.getKey();
+                    if (fireListName.equals("name") || fireListName.equals("email")) continue;
+                    long childList = listNameSnapshot.getChildrenCount();
+                    Log.d(TAG, fireListName + " count =  " + childList);
+
+                    if (mapOfLists.containsValue(fireListName)) {
+                        continue;  // if list already exists we will not update it from cloud
+                    }
+                       getListNameInput(fireListName);
+                   // if (fireListName.equals(mapOfLists.get(listName))) {
+                        for (DataSnapshot productSnapshot : listNameSnapshot.getChildren()){
+                            Product product = productSnapshot.getValue(Product.class);
+                            Log.d(TAG, "**********************************************************************************");
+                            Log.d(TAG, product.getName());
+
+                            if (product.getStatus() == 0) {
+                                if (shoppingList.contains(product))
+                                shoppingList.add(product);
+                                rAdapterToDo.notifyDataSetChanged();
+                            }
+                            else {
+                                doneList.add(product);
+                                rAdapterDone.notifyDataSetChanged();
+                            }
+                        }
+
+
+                }
+
+            }
+
+            @Override
+            public void onCancelled(DatabaseError databaseError) {
+                Log.d(TAG, "error changing data ");
+            }
+        });
     }
 
     @Override

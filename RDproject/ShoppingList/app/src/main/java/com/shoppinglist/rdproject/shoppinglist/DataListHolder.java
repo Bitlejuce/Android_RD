@@ -146,13 +146,13 @@ public class DataListHolder {
         return arrTblNames;
     }
 
-    public int getMaxIndexOfTable(){
+    public int getNextIndexOfTable(){
         int index = 0;
         List<String> arrTblNames = getListOfLists();
         for (String s: arrTblNames){
             int listIndex = Integer.parseInt(s.replace("Newlist", ""));
             index = index > listIndex ? index : listIndex;
         }
-        return index;
+        return index+1;
     }
 }
