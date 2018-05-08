@@ -1,24 +1,17 @@
 package com.shoppinglist.rdproject.shoppinglist.adapters;
 
 import android.app.Activity;
-import android.content.Context;
 import android.support.design.widget.Snackbar;
 import android.support.v7.widget.CardView;
 import android.support.v7.widget.RecyclerView;
-import android.util.Log;
-import android.view.ContextMenu;
 import android.view.LayoutInflater;
-import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.TextView;
 
 import com.google.android.gms.ads.AdRequest;
-import com.google.android.gms.ads.AdSize;
 import com.google.android.gms.ads.AdView;
-import com.shoppinglist.rdproject.shoppinglist.DBHelper;
-import com.shoppinglist.rdproject.shoppinglist.DataListHolder;
 import com.shoppinglist.rdproject.shoppinglist.MainScreen;
 import com.shoppinglist.rdproject.shoppinglist.Product;
 import com.shoppinglist.rdproject.shoppinglist.R;
@@ -31,20 +24,20 @@ public class RVAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder>{
 
     private static final int AD_TYPE = 101;
     private static final int CONTENT_TYPE = 202;
+    public static final int STATUS_TODO = 0;
+    public static final int STATUS_DONE = 1;
     private List<Product> product;
     private int layoutId;
     private Activity context;
-    private DataListHolder dataListHolder;
     public List<Product> getProductList() {
         return product;
     }
 
-    public RVAdapter(Activity context, List<Product> product, int layoutId, DataListHolder dataListHolder){
+    public RVAdapter(Activity context, List<Product> product, int layoutId){
 
         this.product = product;
         this.layoutId = layoutId;
         this.context = context;
-        this.dataListHolder = dataListHolder;
     }
     @Override
     public  RecyclerView.ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
@@ -158,10 +151,10 @@ public class RVAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder>{
                 RVAdapter adapterTo = (RVAdapter) listTo.getAdapter();
 
                 product = adapterFrom.getProductList().get(position);
-                if (product.getStatus() == DBHelper.STATUS_TODO) {
-                    product.setStatus(DBHelper.STATUS_DONE);
+                if (product.getStatus() == STATUS_TODO) {
+                    product.setStatus(STATUS_DONE);
                 }else {
-                    product.setStatus(DBHelper.STATUS_TODO);
+                    product.setStatus(STATUS_TODO);
                 }
                 List<Product> listWhereAddProduct = adapterTo.getProductList();
                 List<Product> listWhereRemoveProduct = adapterFrom.getProductList();
@@ -173,7 +166,7 @@ public class RVAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder>{
                     adapterFrom.notifyDataSetChanged();
 
 
-                dataListHolder.update(product);
+               //update base here
 
 
                 if (layoutId == R.id.lis_to_do) {

@@ -31,7 +31,7 @@ public class AddDialog extends DialogFragment {
         add.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                String inputString = input.getText().toString();
+                String inputString = input.getText().toString().trim();
                 String inputQty = qty.getText().toString();
                 if (!inputString.equals("")) {
                     onTextInputListener.getUserInput(inputString, inputQty);

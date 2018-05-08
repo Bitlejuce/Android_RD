@@ -1,13 +1,16 @@
 package com.shoppinglist.rdproject.shoppinglist;
 
 
+import com.shoppinglist.rdproject.shoppinglist.adapters.RVAdapter;
+
 import java.util.Objects;
 
 public class Product {
 
-        public String name;
-        public String quantity;
-        public int status;
+        private String productId;
+        private String name;
+        private String quantity;
+        private int status;
 
     public Product() {
     }
@@ -15,13 +18,21 @@ public class Product {
         public Product(String name, String quantity) {
             this.name = name;
             this.quantity = quantity;
-            this.status = DBHelper.STATUS_TODO;
+            this.status = RVAdapter.STATUS_TODO;
         }
 
     public Product(String name, String quantity, int status) {
         this.name = name;
         this.quantity = quantity;
         this.status = status;
+    }
+
+    public String getProductId() {
+        return productId;
+    }
+
+    public void setProductId(String productId) {
+        this.productId = productId;
     }
 
     public String getName() {
@@ -62,12 +73,12 @@ public class Product {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         Product product = (Product) o;
-        return Objects.equals(name, product.name);
+        return Objects.equals(productId, product.productId);
     }
 
     @Override
     public int hashCode() {
 
-        return Objects.hash(name);
+        return Objects.hash(productId);
     }
 }

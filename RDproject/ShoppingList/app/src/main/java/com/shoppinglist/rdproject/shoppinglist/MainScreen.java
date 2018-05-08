@@ -41,6 +41,7 @@ import com.google.firebase.database.ValueEventListener;
 import com.shoppinglist.rdproject.shoppinglist.adapters.RVAdapter;
 import com.shoppinglist.rdproject.shoppinglist.dialogs.*;
 import com.shoppinglist.rdproject.shoppinglist.login.LoginActivity;
+import com.shoppinglist.rdproject.shoppinglist.login.User;
 import com.squareup.picasso.Picasso;
 
 import org.json.JSONException;
@@ -58,7 +59,8 @@ import jp.wasabeef.picasso.transformations.CropCircleTransformation;
 
 public class MainScreen extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener, AddDialog.OnTextInputListener, AddListDialog.OnListNameInputListener,
-        RenameListDialog.OnListListRenameListener, ChooseListDialog.OnChooseListListener, ModifyListDialog.OnModifyListListener, ModifyItemDialog.OnItemModifyListener {
+        RenameListDialog.OnListListRenameListener, ChooseListDialog.OnChooseListListener, ModifyListDialog.OnModifyListListener,
+        ModifyItemDialog.OnItemModifyListener {
     public static final String TAG = "MainActivity";
     public static final int LOGIN_RESULT = 2121;
     public static final String APP_PREFERENCES = "listsettings";
@@ -68,19 +70,22 @@ public class MainScreen extends AppCompatActivity
     public static final String APP_PREFERENCES_IS_ADS_FREE = "isAdsfree";
     public static final String ADMOB_APP_ID = "ca-app-pub-8462980126781299~7734683972";
     public static final String ADMOB_BANNER_ID = "ca-app-pub-8462980126781299/5410228378";
+
     public static boolean isAdsfree = false;
     public static boolean isAdsfreeForNow = false;
+    private static int listCounter;
+
+    private User localUser;
     public String userId;
     private SharedPreferences mSettings;
     private RecyclerView rViewToDo;
     private RecyclerView rViewDone;
     private RVAdapter rAdapterToDo;
     private RVAdapter rAdapterDone;
-    private RecyclerView.LayoutManager rLayoutManagerDo;
-    private RecyclerView.LayoutManager rLayoutManagerDone;
-    private DataListHolder dataListHolder;
-    private List<Product> shoppingList;
-    private List<Product> doneList;
+   // private RecyclerView.LayoutManager rLayoutManagerDo;
+   // private RecyclerView.LayoutManager rLayoutManagerDone;
+    private List<Product> shoppingList = new ArrayList<>();
+    private List<Product> doneList = new ArrayList<>();
     private String listName;
     private List<String> listOfListsToDisplay;
     private Map<String, String> mapOfLists;
@@ -122,74 +127,157 @@ public class MainScreen extends AppCompatActivity
 
         NavigationView navigationView = (NavigationView) findViewById(R.id.nav_view);
         navigationView.setNavigationItemSelectedListener(this);
-        //logMenuItem = navigationView.getMenu().findItem(R.id.log_out);
+
         // end of template
         // start code
         isAdsfreeForNow = false;
         mSettings = getSharedPreferences(APP_PREFERENCES, Context.MODE_PRIVATE);
-        loadPreferences();
-        bindUserViews();
-
-        setTitle(mapOfLists.get(listName));
-        dataListHolder = new DataListHolder(MainScreen.this, listName);
-        shoppingList = dataListHolder.getShoppingList();
-        doneList = dataListHolder.getDoneList();
-
-        rViewToDo = findViewById(R.id.lis_to_do);
-        rViewToDo.setHasFixedSize(true);
-        rLayoutManagerDo = new LinearLayoutManager(this);
-        rViewToDo.setLayoutManager(rLayoutManagerDo);
-        rAdapterToDo = new RVAdapter(this, shoppingList, R.id.lis_to_do, dataListHolder);
-        rViewToDo.setAdapter(rAdapterToDo);
-
-        rViewDone = findViewById(R.id.list_done);
-        rViewDone.setHasFixedSize(true);
-        rLayoutManagerDone = new LinearLayoutManager(this);
-        rViewDone.setLayoutManager(rLayoutManagerDone);
-        rAdapterDone = new RVAdapter(this, doneList, R.id.list_done, dataListHolder);
-        rViewDone.setAdapter(rAdapterDone);
-
-        listOfListsToDisplay = getListOfTablesToDisplay();
-        chooseListSpinner = createSpinner();
-        //Firebase ini
         userId =  Settings.Secure.getString(this.getContentResolver(), Settings.Secure.ANDROID_ID);
         mAuth = FirebaseAuth.getInstance();
         database = FirebaseDatabaseUtil.getDatabase();
 
+        loadPreferences();
+        bindUserViews();
+
+        rViewToDo = findViewById(R.id.lis_to_do);
+        rViewToDo.setHasFixedSize(true);
+        rViewToDo.setLayoutManager(new LinearLayoutManager(this));
+        rAdapterToDo = new RVAdapter(this, shoppingList, R.id.lis_to_do);
+        rViewToDo.setAdapter(rAdapterToDo);
+
+        rViewDone = findViewById(R.id.list_done);
+        rViewDone.setHasFixedSize(true);
+        rViewDone.setLayoutManager(new LinearLayoutManager(this));
+        rAdapterDone = new RVAdapter(this, doneList, R.id.list_done);
+        rViewDone.setAdapter(rAdapterDone);
+
+        listOfListsToDisplay = getListOfTablesToDisplay();
+        //chooseListSpinner = createSpinner();
+        localUser = new User();
+
+        loadData(listName);
+
         Log.d(TAG, "end of onCreate   " +  FacebookSdk.getApplicationSignature(getApplicationContext()));
     }
+
+    private void loadData(String listName) {
+        this.listName = listName;
+        setTitle(listName);
+        databaseInitialize(localUser);
+        DatabaseReference listRef = databaseRef.child(listName);
+
+        ChildEventListener mChildEventListener = new ChildEventListener() {
+            @Override
+            public void onChildAdded(DataSnapshot dataSnapshot, String s) {
+                Product product = dataSnapshot.getValue(Product.class);
+                if (product != null && !shoppingList.contains(product) && !doneList.contains(product)) {
+                    switch (product.getStatus()) {
+                        case 0:
+                            shoppingList.add(0, product);
+                            rAdapterToDo.notifyDataSetChanged();
+                            Log.d(TAG, "shoppingList.contains(product)  - " + product.getName() + "   : " + shoppingList.contains(product));
+                            break;
+                        case 1:
+                            doneList.add(0, product);
+                            rAdapterDone.notifyDataSetChanged();
+                            Log.d(TAG, "shoppingList.contains(product)  - " + product.getName() + "   : " + shoppingList.contains(product));
+                            break;
+                    }
+                }
+            }
+
+            @Override
+            public void onChildChanged(DataSnapshot dataSnapshot, String s) {
+                Product product = dataSnapshot.getValue(Product.class);
+
+                if (shoppingList.contains(product)) {
+                    int index = shoppingList.indexOf(product);
+                    shoppingList.remove(index);
+                    if (product.getStatus() == 0) {
+                        shoppingList.add(index, product);
+                        rAdapterToDo.notifyDataSetChanged();
+                    } else {
+                        doneList.add(0, product);
+                        rAdapterDone.notifyDataSetChanged();
+                    }
+                }
+
+                if (doneList.contains(product)) {
+                    int index = doneList.indexOf(product);
+                    doneList.remove(index);
+                    if (product.getStatus() == 0) {
+                        shoppingList.add(0, product);
+                        rAdapterToDo.notifyDataSetChanged();
+                    } else {
+                        doneList.add(index, product);
+                        rAdapterDone.notifyDataSetChanged();
+                    }
+                }
+            }
+
+            @Override
+            public void onChildRemoved(DataSnapshot dataSnapshot) {
+                Product product = dataSnapshot.getValue(Product.class);
+                if (shoppingList.contains(product)) {
+                    shoppingList.remove(product);
+                    rAdapterToDo.notifyDataSetChanged();
+                    return;
+                }
+                if (doneList.contains(product)) {
+                    doneList.remove(product);
+                    rAdapterDone.notifyDataSetChanged();
+                }
+            }
+
+            @Override  // not implemented
+            public void onChildMoved(DataSnapshot dataSnapshot, String s) {
+                // not using
+            }
+
+            @Override  // not implemented
+            public void onCancelled(DatabaseError databaseError) {
+                // not using
+            }
+        };
+
+        listRef.removeEventListener(mChildEventListener);
+//        Toast.makeText(this, "connected to database.getReference(\"Users\").child(userId);    key is: " + databaseRef.getKey(), Toast.LENGTH_LONG).show();
+//        Log.d(TAG, "connected to database.getReference(\"Users\").child(userId);    key is: " + listRef.getKey());
+        shoppingList.clear();
+        doneList.clear();
+
+        listRef.addChildEventListener(mChildEventListener);
+    }
+    private void databaseInitialize(User currentUser) {
+        databaseRef = database.getReference("Users").child(userId);
+        Map<String, Object> updates = new HashMap<>();
+        updates.put("email", localUser.getEmail());
+        updates.put("name", localUser.getName());
+
+        databaseRef.updateChildren(updates);
+    }
+
     @Override  // here we receive users input in Dialog and add it to shopping list
     public void getUserInput(String input, String quantity) {
         Product product = new Product(input, quantity, 0);
-        shoppingList.add(0, product);
-        rAdapterToDo.notifyItemInserted(0);
-        dataListHolder.insert(product);
-        rViewToDo.scrollToPosition(0);
-        databaseRef.child(mapOfLists.get(listName)).child(input).setValue(product);    //  FIREBASE +
+
+        String productId = product.getProductId();
+        if (productId == null) {
+            // get unique ID from firebase db
+            productId = databaseRef.child(listName).push().getKey();
+            product.setProductId(productId);
+        }
+            databaseRef.child(listName).child(productId).setValue(product);    //  FIREBASE +
     }
     @Override  // here we get name of new list
     public void getListNameInput(String input) {
-        if (mapOfLists.containsValue(input)) {
-            return;
-        }
-        String newTableName = "Newlist" + (dataListHolder.getNextIndexOfTable());
-        this.listName = newTableName;
-        mapOfLists.put(newTableName, input);
-        setTitle(input);
-        renewViewOfMainScreen(newTableName);
-        listOfListsToDisplay.add(0, input);
-        spinnerAdapter.notifyDataSetChanged();
-        chooseListSpinner.setSelection(0);
+        loadData(input);
     }
     @Override  // here we get NEW name of new list (AddListDialog)
     public void getNewListNameInput(String input) {
-        databaseRef.child(mapOfLists.get(listName)).removeValue();    //  FIREBASE +
-        listOfListsToDisplay.remove(mapOfLists.get(listName));
-        listOfListsToDisplay.add(0, input);
-        mapOfLists.put(listName, input);
-        setTitle(input);
-        spinnerAdapter.notifyDataSetChanged();
-        databaseInitialize(mAuth.getCurrentUser());          //  FIREBASE +
+        databaseRef.child(listName).removeValue();    //  FIREBASE +
+        // HERE IS THE PROBLEM WITH UPDATING CHILD NAME
+        //databaseInitialize(localUser);          //  FIREBASE +
     }
     @Override   //getting user choice and update UI  (ChooseListDialog)
     public void getUserChoice(String listNameToDisplay) {
@@ -201,15 +289,14 @@ public class MainScreen extends AppCompatActivity
         }
         setTitle(listNameToDisplay);
         renewViewOfMainScreen(listName);
-        chooseListSpinner.setSelection(listOfListsToDisplay.indexOf(listNameToDisplay));
+        //chooseListSpinner.setSelection(listOfListsToDisplay.indexOf(listNameToDisplay));
         drawer.closeDrawer(GravityCompat.START);
-        databaseInitialize(mAuth.getCurrentUser());    //  FIREBASE+
+        databaseInitialize(localUser);    //  FIREBASE+
     }
     @Override // from Modify List Dialog
     public void getUserConfirm(String option) {
-        databaseRef.child(mapOfLists.get(listName)).removeValue();    //  FIREBASE +
+        databaseRef.child(listName).removeValue();    //  FIREBASE +
             if (option.equals(getResources().getString(R.string.delete_list))) {
-                dataListHolder.deleteTable(listName);
                 listOfListsToDisplay.remove(mapOfLists.get(listName));
                 mapOfLists.remove(listName);
 
@@ -219,63 +306,52 @@ public class MainScreen extends AppCompatActivity
                     setTitle("Newlist1");
                     mapOfLists.put("Newlist1", "Newlist1");
                     listOfListsToDisplay.add("Newlist1");
-                    spinnerAdapter.notifyDataSetChanged();
+                    //spinnerAdapter.notifyDataSetChanged();
                 } else {
-                    String firstTable = dataListHolder.getListOfLists().get(0);
+                    String firstTable = " TEST"; // = dataListHolder.getListOfLists().get(0);
                     listName = firstTable;
                     setTitle(mapOfLists.get(firstTable));
                     listOfListsToDisplay.remove(mapOfLists.get(firstTable));
                     listOfListsToDisplay.add(0, mapOfLists.get(firstTable));
-                    spinnerAdapter.notifyDataSetChanged();
-                    chooseListSpinner.setSelection(0);
+                    //spinnerAdapter.notifyDataSetChanged();
+                    //chooseListSpinner.setSelection(0);
                     renewViewOfMainScreen(firstTable);
-                    databaseInitialize(mAuth.getCurrentUser());
+                    databaseInitialize(localUser);
                 }
-                databaseInitialize(mAuth.getCurrentUser());    //  FIREBASE +
+                databaseInitialize(localUser);    //  FIREBASE +
                 return;
             }else if(option.equals(getResources().getString(R.string.clear_done))) {
                 doneList.clear();
                 rAdapterDone.notifyDataSetChanged();
-                dataListHolder.deleteDone();
-                databaseInitialize(mAuth.getCurrentUser());    //  FIREBASE +
+                databaseInitialize(localUser);    //  FIREBASE +
                 return;
             }else if(option.equals(getResources().getString(R.string.clear_all))) {
                 shoppingList.clear();
                 doneList.clear();
                 rAdapterToDo.notifyDataSetChanged();
                 rAdapterDone.notifyDataSetChanged();
-                dataListHolder.deleteAll();
-                databaseInitialize(mAuth.getCurrentUser());    //  FIREBASE +
+                databaseInitialize(localUser);    //  FIREBASE +
                 return;
         }
-        databaseInitialize(mAuth.getCurrentUser());    //  FIREBASE +
+        databaseInitialize(localUser);    //  FIREBASE +
     }
 
     @Override
     public void getItemModificationInput(String input, List<Product> product, int position) {
         Product p = product.get(position);
-        databaseRef.child(mapOfLists.get(listName)).child(p.getName()).removeValue();   //  FIREBASE +
-        if (input == null) {
-            product.remove(position);
-            dataListHolder.delete(p);
-            rAdapterToDo.notifyDataSetChanged();
-            rAdapterDone.notifyDataSetChanged();
-        } else {
-            dataListHolder.delete(p);
+        databaseRef.child(listName).child(p.getName()).removeValue();
+        if (input != null) {
             p.setName(input);
-            dataListHolder.insert(p);
-            rAdapterToDo.notifyDataSetChanged();
-            rAdapterDone.notifyDataSetChanged();
-            databaseRef.child(mapOfLists.get(listName)).child(p.getName()).setValue(p);    //  FIREBASE +
+            databaseRef.child(listName).child(input).setValue(p);    //  FIREBASE +
         }
     }
 
     private void renewViewOfMainScreen(String newTableName) {
-        dataListHolder.createTableIfNotExists(newTableName);
+
         shoppingList.clear();
         doneList.clear();
-        shoppingList.addAll(dataListHolder.getShoppingList());
-        doneList.addAll(dataListHolder.getDoneList());
+      //  shoppingList.addAll(dataListHolder.getShoppingList());
+      //  doneList.addAll(dataListHolder.getDoneList());
         rAdapterToDo.notifyDataSetChanged();
         rAdapterDone.notifyDataSetChanged();
         //createSpinner();
@@ -376,8 +452,8 @@ public class MainScreen extends AppCompatActivity
                     String userName = data.getStringExtra("userName");
                     String userMail = data.getStringExtra("userMail");
                     Uri userPic = data.getParcelableExtra("userPic");
-
-                    fillUserDatails(userName, userMail, userPic);
+                localUser = new User(userName, userMail, userPic);
+                    fillUserDatails(localUser);
                 }
             }
         }else{
@@ -395,28 +471,15 @@ public class MainScreen extends AppCompatActivity
 
     }
 
-    private void fillUserDatails(String userName, String userMail, Uri userPic) {
-
-        if (userName != null && !userName.equals("")) {
-            userNameView.setText(userName);
-        } else {
-            userNameView.setText(R.string.app_name);
-        }
-        if (userMail != null && !userMail.equals("")) {
-            userMailView.setText(userMail);
-        }else {
-            try {
-                userMailView.setText(mSettings.getString(APP_PREFERENCES_USER_EMAIL, getResources().getString(R.string.make_shopping_easier)));
-            }catch (Exception e){
-                userMailView.setText(R.string.make_shopping_easier);
-            }
-        }
-        if (userPic != null) {
-            Picasso.get().load(userPic).transform(new CropCircleTransformation()).into(userPicView);
+    private void fillUserDatails(User user) {
+            userNameView.setText(user.getName());
+            userMailView.setText(user.getEmail());
+        if (user.getPicUrl() != null) {
+            Picasso.get().load(user.getPicUrl()).transform(new CropCircleTransformation()).into(userPicView);
         }else {
             userPicView.setImageResource(R.mipmap.ic_launcher_round);
         }
-        logMenuItem.setTitle(R.string.logout);
+            logMenuItem.setTitle(R.string.logout);
     }
 
     @Override
@@ -432,18 +495,42 @@ public class MainScreen extends AppCompatActivity
 
         FirebaseUser currentUser = mAuth.getCurrentUser();
         if (currentUser != null) {
-            fillUserDatails(currentUser.getDisplayName(), currentUser.getEmail(), currentUser.getPhotoUrl());
+             localUser = initializeLocalUser(currentUser);
+            fillUserDatails(localUser);
             //userId =  currentUser.getUid();
         }
-        databaseInitialize(currentUser);
+       // databaseInitialize(currentUser);
       //  getRealtimeDataFromFirebase();
         Log.d(TAG, "onStart called   isAdsfree = " + isAdsfree +"  isAdsfreeForNow =   " + isAdsfreeForNow);
     }
 
+    private User initializeLocalUser(FirebaseUser currentUser) {
+        User user;
+        String userName;
+        String userMail;
+        Uri picUrl;
+
+            userName = currentUser.getDisplayName();
+            if (userName == null || userName.equals("")) {
+                userName = "NoNameUser";
+            }
+            userMail = currentUser.getEmail();
+            if (userMail == null || userMail.equals("")) {
+                userMail = mSettings.getString(APP_PREFERENCES_USER_EMAIL, getResources().getString(R.string.make_shopping_easier));
+            }
+            picUrl = currentUser.getPhotoUrl();
+            if (picUrl == null){
+                //need to check it out
+                picUrl = Uri.parse("android.resource://com.shoppinglist.rdproject.shoppinglist/" + R.mipmap.ic_launcher_round);
+            }
+        return new User(userName, userMail, picUrl);
+    }
+
     @Override
     protected void onResume() {
-        rAdapterToDo.notifyDataSetChanged();
-        rAdapterDone.notifyDataSetChanged();
+        loadData(listName);
+//        rAdapterToDo.notifyDataSetChanged();
+//        rAdapterDone.notifyDataSetChanged();
         preferenceChecker();
         super.onResume();
     }
@@ -457,40 +544,7 @@ public class MainScreen extends AppCompatActivity
         }
     }
 
-    private void databaseInitialize(FirebaseUser currentUser) {
-        databaseRef = database.getReference("Users").child(userId);
-        String userName = null;
-        String userMail = null;
-        if (currentUser != null) {
-            userName = currentUser.getDisplayName();
-            if (userName == null || userName.equals("")) {
-                userName = "NoNameUser";
-            }
-            userMail = currentUser.getEmail();
-            if (userMail == null || userMail.equals("")) {
-                try {
-                    userMail = mSettings.getString(APP_PREFERENCES_USER_EMAIL, getResources().getString(R.string.make_shopping_easier));
-                } catch (Exception e) {
-                    // do nothing
-                }
-            }
-        }
-        Map<String, Object> updates = new HashMap<String, Object>();
-        updates.put("email", userMail);
-        updates.put("name", userName);
 
-        databaseRef.updateChildren(updates);
-
-        // add current list to Firebase
-        for (Product product : shoppingList) {
-            if (product != null)
-                databaseRef.child(mapOfLists.get(listName)).child(product.getName()).setValue(product);
-        }
-        for (Product product : doneList) {
-            if (product != null)
-                databaseRef.child(mapOfLists.get(listName)).child(product.getName()).setValue(product);
-        }
-    }
 
     private void getRealtimeDataFromFirebase() {
         // retrieve lists from Firebase
@@ -525,7 +579,6 @@ public class MainScreen extends AppCompatActivity
                             }
                         }
 
-
                 }
 
             }
@@ -542,7 +595,7 @@ public class MainScreen extends AppCompatActivity
         // Remember data
         savePreferences();
         //closing database connection
-        dataListHolder.close();
+
 
         if (PreferenceManager.getDefaultSharedPreferences(this).getBoolean("log_out_on_exit", false) && mAuth.getCurrentUser() != null){
             mAuth.signOut();
@@ -570,7 +623,7 @@ public class MainScreen extends AppCompatActivity
 
     void loadPreferences() {
         if (mSettings.contains(APP_PREFERENCES_LIST_NAME)) {
-            listName = mSettings.getString(APP_PREFERENCES_LIST_NAME, "");
+            listName = mSettings.getString(APP_PREFERENCES_LIST_NAME, "Newlist1");
             String savedMap = mSettings.getString(APP_PREFERENCES_MAP_OF_LISTS, "");
             mapOfLists = getSavedMap(savedMap);
             isAdsfree = mSettings.getBoolean(APP_PREFERENCES_IS_ADS_FREE, false);
