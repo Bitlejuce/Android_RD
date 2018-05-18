@@ -21,8 +21,7 @@ public class ModifyItemDialog extends DialogFragment {
         private EditText inputListName;
         private Button renameItem, deleteItem, cancelItemModification;
         public OnItemModifyListener onItemModifyListener;
-        private List<Product> productList;
-        private int itemPosition;
+        private Product product;
 
         @Override
         public Dialog onCreateDialog(Bundle savedInstanceState) {
@@ -30,7 +29,7 @@ public class ModifyItemDialog extends DialogFragment {
             LayoutInflater inflater = getActivity().getLayoutInflater();
             View dialogAddList = inflater.inflate(R.layout.modify_item_dialog, null);
             inputListName = dialogAddList.findViewById(R.id.enter_product_name);
-            inputListName.setHint(productList.get(itemPosition).getName());
+            inputListName.setHint(product.getName());
             renameItem = dialogAddList.findViewById(R.id.rename_item);
             deleteItem = dialogAddList.findViewById(R.id.delete_item);
             cancelItemModification = dialogAddList.findViewById(R.id.cancel_add_item_button);
@@ -42,7 +41,8 @@ public class ModifyItemDialog extends DialogFragment {
                     if (inputString.isEmpty()){
                         inputListName.setError("Enter as least one symbol");
                     }else {
-                        onItemModifyListener.getItemModificationInput(inputString.trim(), productList, itemPosition);
+                        product.setName(inputString);
+                        onItemModifyListener.getItemModificationInput(product);
                         getDialog().dismiss();
                     }
                 }
@@ -50,7 +50,8 @@ public class ModifyItemDialog extends DialogFragment {
             deleteItem.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View view) {
-                    onItemModifyListener.getItemModificationInput(null, productList, itemPosition);
+                    product.setName(null);
+                    onItemModifyListener.getItemModificationInput(product);
                     getDialog().dismiss();
                 }
             });
@@ -77,13 +78,12 @@ public class ModifyItemDialog extends DialogFragment {
             }
         }
 
-    public void setItemToModify(List<Product> product, int position) {
-        productList = product;
-        itemPosition = position;
+    public void setItemToModify(Product p) {
+        product = p;
     }
 
     public interface OnItemModifyListener{
-            void getItemModificationInput(String input, List<Product> product, int position);
+            void getItemModificationInput(Product p);
         }
     }
 

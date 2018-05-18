@@ -42,6 +42,7 @@ import com.shoppinglist.rdproject.shoppinglist.adapters.RVAdapter;
 import com.shoppinglist.rdproject.shoppinglist.dialogs.*;
 import com.shoppinglist.rdproject.shoppinglist.login.LoginActivity;
 import com.shoppinglist.rdproject.shoppinglist.login.User;
+import com.shoppinglist.rdproject.shoppinglist.service.SharingListService;
 import com.squareup.picasso.Picasso;
 
 import org.json.JSONException;
@@ -60,8 +61,8 @@ import jp.wasabeef.picasso.transformations.CropCircleTransformation;
 public class MainScreen extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener, AddDialog.OnTextInputListener, AddListDialog.OnListNameInputListener,
         RenameListDialog.OnListListRenameListener, ChooseListDialog.OnChooseListListener, ModifyListDialog.OnModifyListListener,
-        ModifyItemDialog.OnItemModifyListener {
-    public static final String TAG = "MainActivity";
+        ModifyItemDialog.OnItemModifyListener, ChooseSharedListDialog.OnChooseSharedListListener {
+    public static final String TAG = "MainActivityTAG";
     public static final int LOGIN_RESULT = 2121;
     public static final String APP_PREFERENCES = "listsettings";
     public static final String APP_PREFERENCES_LIST_NAME = "listName";
@@ -70,6 +71,7 @@ public class MainScreen extends AppCompatActivity
     public static final String APP_PREFERENCES_IS_ADS_FREE = "isAdsfree";
     public static final String ADMOB_APP_ID = "ca-app-pub-8462980126781299~7734683972";
     public static final String ADMOB_BANNER_ID = "ca-app-pub-8462980126781299/5410228378";
+    private static final int FIND_USER_TO_SHARE = 3131;
 
     public static boolean isAdsfree = false;
     public static boolean isAdsfreeForNow = false;
@@ -82,11 +84,11 @@ public class MainScreen extends AppCompatActivity
     private RecyclerView rViewDone;
     private RVAdapter rAdapterToDo;
     private RVAdapter rAdapterDone;
-   // private RecyclerView.LayoutManager rLayoutManagerDo;
-   // private RecyclerView.LayoutManager rLayoutManagerDone;
     private List<Product> shoppingList = new ArrayList<>();
     private List<Product> doneList = new ArrayList<>();
+    private List<SharedList> sharedLists = new ArrayList<>();
     private String listName;
+    private String pathToList;
     private List<String> listOfListsToDisplay;
     private Map<String, String> mapOfLists;
     private Spinner chooseListSpinner;
@@ -94,7 +96,7 @@ public class MainScreen extends AppCompatActivity
     private DrawerLayout drawer;
     private FirebaseAuth mAuth;
     private FirebaseDatabase database;
-    private DatabaseReference databaseRef;
+    public DatabaseReference databaseRef;
 
     private ImageView userPicView;
     private TextView userNameView;
@@ -110,7 +112,6 @@ public class MainScreen extends AppCompatActivity
         setSupportActionBar(toolbar);
 
         FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
-        //fab.setImageResource(R.drawable.ic_add_shopping_cart_black_48dp);
         fab.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -133,6 +134,7 @@ public class MainScreen extends AppCompatActivity
         isAdsfreeForNow = false;
         mSettings = getSharedPreferences(APP_PREFERENCES, Context.MODE_PRIVATE);
         userId =  Settings.Secure.getString(this.getContentResolver(), Settings.Secure.ANDROID_ID);
+        //userId =  "00000000000000000000000000000000000000000000000000000000000";
         mAuth = FirebaseAuth.getInstance();
         database = FirebaseDatabaseUtil.getDatabase();
 
@@ -152,19 +154,28 @@ public class MainScreen extends AppCompatActivity
         rViewDone.setAdapter(rAdapterDone);
 
         listOfListsToDisplay = getListOfTablesToDisplay();
-        //chooseListSpinner = createSpinner();
+        chooseListSpinner = createSpinner();
         localUser = new User();
 
-        loadData(listName);
+        pathToList = userId + "/" + listName;
+        loadData(pathToList);
+        loadSharedLists();
 
         Log.d(TAG, "end of onCreate   " +  FacebookSdk.getApplicationSignature(getApplicationContext()));
     }
 
-    private void loadData(String listName) {
-        this.listName = listName;
-        setTitle(listName);
+    private void loadData(String path) {
+
+        if (path.contains(userId)) {                                // in case we get path to our self list
+            this.listName = path.substring(path.lastIndexOf('/') + 1);
+            if (mapOfLists.containsKey(listName)) {
+                setTitle(mapOfLists.get(listName));
+            } else {
+                setTitle(listName);
+            }
+        }
         databaseInitialize(localUser);
-        DatabaseReference listRef = databaseRef.child(listName);
+        DatabaseReference listRef = databaseRef.child(path);
 
         ChildEventListener mChildEventListener = new ChildEventListener() {
             @Override
@@ -175,12 +186,12 @@ public class MainScreen extends AppCompatActivity
                         case 0:
                             shoppingList.add(0, product);
                             rAdapterToDo.notifyDataSetChanged();
-                            Log.d(TAG, "shoppingList.contains(product)  - " + product.getName() + "   : " + shoppingList.contains(product));
+                            //Log.d(TAG, "shoppingList.contains(product)  - " + product.getName() + "   : " + shoppingList.contains(product));
                             break;
                         case 1:
                             doneList.add(0, product);
                             rAdapterDone.notifyDataSetChanged();
-                            Log.d(TAG, "shoppingList.contains(product)  - " + product.getName() + "   : " + shoppingList.contains(product));
+                            //Log.d(TAG, "shoppingList.contains(product)  - " + product.getName() + "   : " + shoppingList.contains(product));
                             break;
                     }
                 }
@@ -200,6 +211,7 @@ public class MainScreen extends AppCompatActivity
                         doneList.add(0, product);
                         rAdapterDone.notifyDataSetChanged();
                     }
+                    return;
                 }
 
                 if (doneList.contains(product)) {
@@ -241,20 +253,68 @@ public class MainScreen extends AppCompatActivity
         };
 
         listRef.removeEventListener(mChildEventListener);
-//        Toast.makeText(this, "connected to database.getReference(\"Users\").child(userId);    key is: " + databaseRef.getKey(), Toast.LENGTH_LONG).show();
-//        Log.d(TAG, "connected to database.getReference(\"Users\").child(userId);    key is: " + listRef.getKey());
         shoppingList.clear();
         doneList.clear();
-
+        rAdapterToDo.notifyDataSetChanged();
         listRef.addChildEventListener(mChildEventListener);
+
     }
+
+    public void loadSharedLists(){
+
+        ChildEventListener sharedChildEventListener = new ChildEventListener() {
+            @Override
+            public void onChildAdded(DataSnapshot dataSnapshot, String s) {
+                SharedList sharedList = dataSnapshot.getValue(SharedList.class);
+                String sharedListName = sharedList.getSharedListName();
+                String fromUserName = sharedList.getFromUserName();
+                if (!sharedLists.contains(sharedList)) {
+                    sharedLists.add(sharedList);
+                }
+//                String fromUserEmail = sharedList.getFromUserEmail();
+//                SharingListService notifyService = new SharingListService();
+//                String messageBody = fromUserName + " (" + fromUserEmail + ") " +
+//                        getString(R.string.want_to_share_list) + sharedListName;
+                //notifyService.sendNotification(messageBody);
+            }
+
+            @Override
+            public void onChildChanged(DataSnapshot dataSnapshot, String s) {
+
+            }
+
+            @Override
+            public void onChildRemoved(DataSnapshot dataSnapshot) {
+
+                SharedList sharedList = dataSnapshot.getValue(SharedList.class);
+                if (sharedLists.contains(sharedList)) {
+                    sharedLists.remove(sharedList);
+                }
+            }
+
+            @Override
+            public void onChildMoved(DataSnapshot dataSnapshot, String s) {
+
+            }
+
+            @Override
+            public void onCancelled(DatabaseError databaseError) {
+
+            }
+        };
+        databaseRef.child(userId).child("sharedlists").removeEventListener(sharedChildEventListener);
+            sharedLists.clear();
+        databaseRef.child(userId).child("sharedlists").addChildEventListener(sharedChildEventListener);
+    }
+
     private void databaseInitialize(User currentUser) {
-        databaseRef = database.getReference("Users").child(userId);
+        databaseRef = database.getReference("Users");
         Map<String, Object> updates = new HashMap<>();
         updates.put("email", localUser.getEmail());
         updates.put("name", localUser.getName());
+        updates.put("picUrl", localUser.getPicUrl());
 
-        databaseRef.updateChildren(updates);
+        databaseRef.child(userId).updateChildren(updates);
     }
 
     @Override  // here we receive users input in Dialog and add it to shopping list
@@ -264,20 +324,25 @@ public class MainScreen extends AppCompatActivity
         String productId = product.getProductId();
         if (productId == null) {
             // get unique ID from firebase db
-            productId = databaseRef.child(listName).push().getKey();
+            productId = databaseRef.child(pathToList).push().getKey();
             product.setProductId(productId);
         }
-            databaseRef.child(listName).child(productId).setValue(product);    //  FIREBASE +
+            databaseRef.child(pathToList).child(productId).setValue(product);    //  FIREBASE +
     }
-    @Override  // here we get name of new list
+    @Override  // here we get name of new list (AddListDialog)
     public void getListNameInput(String input) {
-        loadData(input);
+        pathToList = userId + "/" + input;
+        mapOfLists.put(input, input);
+        loadData(pathToList);
+        updateSpinner(input);
     }
-    @Override  // here we get NEW name of new list (AddListDialog)
+
+    @Override  // here we get NEW name of OLD list (RenameListDialog)
     public void getNewListNameInput(String input) {
-        databaseRef.child(listName).removeValue();    //  FIREBASE +
-        // HERE IS THE PROBLEM WITH UPDATING CHILD NAME
-        //databaseInitialize(localUser);          //  FIREBASE +
+        listOfListsToDisplay.remove(mapOfLists.get(listName));
+        mapOfLists.put(listName, input);
+        setTitle(input);
+        updateSpinner(input);
     }
     @Override   //getting user choice and update UI  (ChooseListDialog)
     public void getUserChoice(String listNameToDisplay) {
@@ -288,73 +353,63 @@ public class MainScreen extends AppCompatActivity
             }
         }
         setTitle(listNameToDisplay);
-        renewViewOfMainScreen(listName);
-        //chooseListSpinner.setSelection(listOfListsToDisplay.indexOf(listNameToDisplay));
-        drawer.closeDrawer(GravityCompat.START);
-        databaseInitialize(localUser);    //  FIREBASE+
+        pathToList = userId + "/" + listName;
+        loadData(pathToList);
+        updateSpinner(listNameToDisplay);
     }
+
+    @Override // from ChooseSharedListDialog
+    public void getUserSharedListChoice(String sharedList, String sharedUserID) {
+        setTitle(sharedList);
+        String sharedListName = sharedList.substring(0, sharedList.indexOf('(')).trim();
+        pathToList = sharedUserID + "/" + sharedListName;
+        loadData(pathToList);
+        //updateSpinner(sharedList);
+    }
+
     @Override // from Modify List Dialog
     public void getUserConfirm(String option) {
-        databaseRef.child(listName).removeValue();    //  FIREBASE +
+
             if (option.equals(getResources().getString(R.string.delete_list))) {
+                databaseRef.child(pathToList).removeValue();    //  FIREBASE +
                 listOfListsToDisplay.remove(mapOfLists.get(listName));
                 mapOfLists.remove(listName);
 
                 if (mapOfLists.isEmpty()) {
-                    renewViewOfMainScreen("Newlist1");
-                    listName = "Newlist1";
-                    setTitle("Newlist1");
-                    mapOfLists.put("Newlist1", "Newlist1");
-                    listOfListsToDisplay.add("Newlist1");
-                    //spinnerAdapter.notifyDataSetChanged();
+                    new AddListDialog().show(getFragmentManager(), "AddListDialog");
                 } else {
-                    String firstTable = " TEST"; // = dataListHolder.getListOfLists().get(0);
-                    listName = firstTable;
-                    setTitle(mapOfLists.get(firstTable));
-                    listOfListsToDisplay.remove(mapOfLists.get(firstTable));
-                    listOfListsToDisplay.add(0, mapOfLists.get(firstTable));
-                    //spinnerAdapter.notifyDataSetChanged();
-                    //chooseListSpinner.setSelection(0);
-                    renewViewOfMainScreen(firstTable);
-                    databaseInitialize(localUser);
+                    getUserChoice(listOfListsToDisplay.get(0));
                 }
-                databaseInitialize(localUser);    //  FIREBASE +
                 return;
             }else if(option.equals(getResources().getString(R.string.clear_done))) {
-                doneList.clear();
-                rAdapterDone.notifyDataSetChanged();
-                databaseInitialize(localUser);    //  FIREBASE +
+                for (Product p : doneList){
+                    databaseRef.child(pathToList).child(p.getProductId()).removeValue();
+                }
+
                 return;
             }else if(option.equals(getResources().getString(R.string.clear_all))) {
-                shoppingList.clear();
-                doneList.clear();
-                rAdapterToDo.notifyDataSetChanged();
-                rAdapterDone.notifyDataSetChanged();
-                databaseInitialize(localUser);    //  FIREBASE +
+                databaseRef.child(pathToList).removeValue();
+
                 return;
         }
-        databaseInitialize(localUser);    //  FIREBASE +
     }
 
-    @Override
-    public void getItemModificationInput(String input, List<Product> product, int position) {
-        Product p = product.get(position);
-        databaseRef.child(listName).child(p.getName()).removeValue();
-        if (input != null) {
-            p.setName(input);
-            databaseRef.child(listName).child(input).setValue(p);    //  FIREBASE +
+    private void updateSpinner(String input) {
+        if (!listOfListsToDisplay.contains(input)){
+            listOfListsToDisplay.add(input);
         }
+        spinnerAdapter.notifyDataSetChanged();
+        chooseListSpinner.setSelection(listOfListsToDisplay.indexOf(input));
     }
 
-    private void renewViewOfMainScreen(String newTableName) {
-
-        shoppingList.clear();
-        doneList.clear();
-      //  shoppingList.addAll(dataListHolder.getShoppingList());
-      //  doneList.addAll(dataListHolder.getDoneList());
-        rAdapterToDo.notifyDataSetChanged();
-        rAdapterDone.notifyDataSetChanged();
-        //createSpinner();
+    @Override  //from modify item dialog
+    public void getItemModificationInput(Product p) {
+        String newProductName = p.getName();
+        if (newProductName != null) {
+            databaseRef.child(pathToList).child(p.getProductId()).setValue(p);    //  FIREBASE +
+        }else {
+            databaseRef.child(pathToList).child(p.getProductId()).removeValue();
+        }
     }
 
     @Override
@@ -378,7 +433,15 @@ public class MainScreen extends AppCompatActivity
         ModifyListDialog modifyDialog;
         switch (item.getItemId()) {
             case R.id.share:
-                Toast.makeText(this, "Cannot share yet", Toast.LENGTH_SHORT).show();
+                if (mAuth.getCurrentUser() == null){
+                       Toast.makeText(this, "You must sign in to share list!", Toast.LENGTH_SHORT).show();
+                    return false;
+                }
+                SharedList sharedList = new SharedList(listName, localUser.getName(), localUser.getEmail(), userId);
+                Intent intent = new Intent(this, FindUserToShareList.class);
+                intent.putExtra("sharedList", sharedList);
+                startActivityForResult(intent, FIND_USER_TO_SHARE);
+
                 return true;
             case R.id.rename:
                 new RenameListDialog().show(getFragmentManager(), "RenameListDialog");
@@ -420,10 +483,13 @@ public class MainScreen extends AppCompatActivity
         if (id == R.id.nav_settings) {
             startActivityForResult(new Intent(MainScreen.this, SettingsActivity.class), 0);
             return true;
-        } else if (id == R.id.nav_gallery) {
-
-        } else if (id == R.id.nav_slideshow) {
-
+        } else if (id == R.id.check_shared) {
+            Log.d(TAG, "sharedLists.size =    "  + sharedLists.size() );
+            if (sharedLists.isEmpty()) {
+                Toast.makeText(this, "No list available", Toast.LENGTH_SHORT).show();
+                return true;
+            }
+            new ChooseSharedListDialog().show(getFragmentManager(), "ChooseSharedListDialog");
         } else if (id == R.id.log_out) {
             if (drawer.isDrawerOpen(GravityCompat.START)) {
                 drawer.closeDrawer(GravityCompat.START);
@@ -452,7 +518,8 @@ public class MainScreen extends AppCompatActivity
                     String userName = data.getStringExtra("userName");
                     String userMail = data.getStringExtra("userMail");
                     Uri userPic = data.getParcelableExtra("userPic");
-                localUser = new User(userName, userMail, userPic);
+
+                localUser = new User(userName, userMail, userPic.toString());
                     fillUserDatails(localUser);
                 }
             }
@@ -466,9 +533,6 @@ public class MainScreen extends AppCompatActivity
         userNameView.setText(R.string.app_name);
         userMailView.setText(R.string.make_shopping_easier);
         logMenuItem.setTitle(R.string.login);
-//        if (isAdsfree) adsRemoveMenuItem.setVisible(false);
-//        else adsRemoveMenuItem.setVisible(true);
-
     }
 
     private void fillUserDatails(User user) {
@@ -497,18 +561,15 @@ public class MainScreen extends AppCompatActivity
         if (currentUser != null) {
              localUser = initializeLocalUser(currentUser);
             fillUserDatails(localUser);
-            //userId =  currentUser.getUid();
         }
-       // databaseInitialize(currentUser);
-      //  getRealtimeDataFromFirebase();
         Log.d(TAG, "onStart called   isAdsfree = " + isAdsfree +"  isAdsfreeForNow =   " + isAdsfreeForNow);
+        Log.d(TAG, "listOfListsToDisplay = " + listOfListsToDisplay +"  mapOfLists =   " + mapOfLists);
     }
 
     private User initializeLocalUser(FirebaseUser currentUser) {
-        User user;
         String userName;
         String userMail;
-        Uri picUrl;
+        String picUrl;
 
             userName = currentUser.getDisplayName();
             if (userName == null || userName.equals("")) {
@@ -518,23 +579,23 @@ public class MainScreen extends AppCompatActivity
             if (userMail == null || userMail.equals("")) {
                 userMail = mSettings.getString(APP_PREFERENCES_USER_EMAIL, getResources().getString(R.string.make_shopping_easier));
             }
-            picUrl = currentUser.getPhotoUrl();
-            if (picUrl == null){
+            Uri uri = currentUser.getPhotoUrl();
+            if (uri == null){
                 //need to check it out
-                picUrl = Uri.parse("android.resource://com.shoppinglist.rdproject.shoppinglist/" + R.mipmap.ic_launcher_round);
+                picUrl = Uri.parse("android.resource://com.shoppinglist.rdproject.shoppinglist/" + R.mipmap.ic_launcher_round).toString();
+            }else {
+                picUrl = uri.toString();
             }
         return new User(userName, userMail, picUrl);
     }
 
     @Override
     protected void onResume() {
-        loadData(listName);
-//        rAdapterToDo.notifyDataSetChanged();
-//        rAdapterDone.notifyDataSetChanged();
+        loadData(pathToList);
         preferenceChecker();
         super.onResume();
     }
-
+            // to check out if lock screen mode on/off
     private void preferenceChecker() {
         SharedPreferences sp = PreferenceManager.getDefaultSharedPreferences(this);
         if (sp.getBoolean("lock_screen", false)) {
@@ -544,59 +605,11 @@ public class MainScreen extends AppCompatActivity
         }
     }
 
-
-
-    private void getRealtimeDataFromFirebase() {
-        // retrieve lists from Firebase
-        databaseRef.addValueEventListener(new ValueEventListener() {
-            @Override
-            public void onDataChange(DataSnapshot dataSnapshot) {
-                Log.d(TAG, "data is changed");
-                for (DataSnapshot listNameSnapshot : dataSnapshot.getChildren()) {
-                    String fireListName = listNameSnapshot.getKey();
-                    if (fireListName.equals("name") || fireListName.equals("email")) continue;
-                    long childList = listNameSnapshot.getChildrenCount();
-                    Log.d(TAG, fireListName + " count =  " + childList);
-
-                    if (mapOfLists.containsValue(fireListName)) {
-                        continue;  // if list already exists we will not update it from cloud
-                    }
-                       getListNameInput(fireListName);
-                   // if (fireListName.equals(mapOfLists.get(listName))) {
-                        for (DataSnapshot productSnapshot : listNameSnapshot.getChildren()){
-                            Product product = productSnapshot.getValue(Product.class);
-                            Log.d(TAG, "**********************************************************************************");
-                            Log.d(TAG, product.getName());
-
-                            if (product.getStatus() == 0) {
-                                if (shoppingList.contains(product))
-                                shoppingList.add(product);
-                                rAdapterToDo.notifyDataSetChanged();
-                            }
-                            else {
-                                doneList.add(product);
-                                rAdapterDone.notifyDataSetChanged();
-                            }
-                        }
-
-                }
-
-            }
-
-            @Override
-            public void onCancelled(DatabaseError databaseError) {
-                Log.d(TAG, "error changing data ");
-            }
-        });
-    }
-
     @Override
     protected void onDestroy() {
         // Remember data
         savePreferences();
-        //closing database connection
-
-
+        //sign out if required
         if (PreferenceManager.getDefaultSharedPreferences(this).getBoolean("log_out_on_exit", false) && mAuth.getCurrentUser() != null){
             mAuth.signOut();
         }
@@ -654,14 +667,18 @@ public class MainScreen extends AppCompatActivity
     private String saveMapToString(Map<String, String> map) {
         JSONObject jsonObject = new JSONObject(map);
         return jsonObject.toString();
-
     }
+
     public List<String> getListOfTablesToDisplay() {
         List<String> list = new ArrayList<>();
-        for (String s: mapOfLists.keySet())
+        for (String s: mapOfLists.keySet()) {
             list.add(mapOfLists.get(s));
-        list.remove(mapOfLists.get(listName));
-        list.add(0, mapOfLists.get(listName));
+            Log.d(TAG, "mapOfLists.get(s)  =  " +  mapOfLists.get(s));
+        }
+        if (mapOfLists.get(listName) != null) {
+            list.remove(mapOfLists.get(listName));
+            list.add(0, mapOfLists.get(listName));
+        }
         return list;
     }
 
@@ -673,6 +690,9 @@ public class MainScreen extends AppCompatActivity
             @Override
             public void onItemSelected(AdapterView<?> adapterView, View view, int i, long l) {
                 getUserChoice(listOfListsToDisplay.get(i));
+                if (drawer.isDrawerOpen(GravityCompat.START)) {
+                    drawer.closeDrawer(GravityCompat.START);
+                }
             }
 
             @Override
@@ -689,4 +709,9 @@ public class MainScreen extends AppCompatActivity
         adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
         return adapter;
     }
+
+    public List<SharedList> getSharedLists() {
+        return sharedLists;
+    }
+
 }

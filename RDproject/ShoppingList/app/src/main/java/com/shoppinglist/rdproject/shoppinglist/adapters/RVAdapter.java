@@ -91,22 +91,9 @@ public class RVAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder>{
 
     @Override
     public int getItemCount() {
-//        if (product.size()>5 && !MainScreen.isAdsfree){
-//            return product.size() + 1;
-//        }
         return product.size();
     }
 
-//    private int getRealPosition(int position) {
-//        if (MainScreen.isAdsfree) {
-//            return position;
-//        } else {
-//            if (getItemViewType(position) == CONTENT_TYPE && position > 5){
-//            return position -1;
-//        }
-//            return position;
-//        }
-//    }
 
     public class AdsViewHolder extends RecyclerView.ViewHolder {
         AdView mAdView;
@@ -133,65 +120,29 @@ public class RVAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder>{
 
         @Override
         public void onClick(View view) {
-            try {
-                RecyclerView listFrom;
-                RecyclerView listTo;
-                int position = getAdapterPosition();
-                Product product;
+            int position = getAdapterPosition();
+            Product p = RVAdapter.this.getProductList().get(position);
+            if (p.getStatus() == STATUS_TODO){
+                p.setStatus(STATUS_DONE);
+            }else{
+                p.setStatus(STATUS_TODO);
+            }
+            MainScreen mainScreen = (MainScreen) context;    //  FIREBASE +
+            mainScreen.getItemModificationInput(p);
 
                 if (layoutId == R.id.lis_to_do) {
-                    listFrom = (RecyclerView) view.getRootView().findViewById(R.id.lis_to_do);   // testing
-                    listTo = (RecyclerView) view.getRootView().findViewById(R.id.list_done);   // testing
-                } else {
-                    listTo = (RecyclerView) view.getRootView().findViewById(R.id.lis_to_do);   // testing
-                    listFrom = (RecyclerView) view.getRootView().findViewById(R.id.list_done);   // testing
-                }
-
-                RVAdapter adapterFrom = (RVAdapter) listFrom.getAdapter();
-                RVAdapter adapterTo = (RVAdapter) listTo.getAdapter();
-
-                product = adapterFrom.getProductList().get(position);
-                if (product.getStatus() == STATUS_TODO) {
-                    product.setStatus(STATUS_DONE);
-                }else {
-                    product.setStatus(STATUS_TODO);
-                }
-                List<Product> listWhereAddProduct = adapterTo.getProductList();
-                List<Product> listWhereRemoveProduct = adapterFrom.getProductList();
-
-                    listWhereAddProduct.add(0, product);
-                    adapterTo.notifyDataSetChanged();
-
-                    listWhereRemoveProduct.remove(position);
-                    adapterFrom.notifyDataSetChanged();
-
-
-               //update base here
-
-
-                if (layoutId == R.id.lis_to_do) {
-                    Snackbar.make(view, "Well done, you just got  " + (product.getName() + "!"), Snackbar.LENGTH_LONG)
+                    Snackbar.make(view, mainScreen.getString(R.string.well_done_you_got) + " " + (p.getName() + "!"), Snackbar.LENGTH_LONG)
                             .setAction("Action", null).show();
                 }
-
-            } catch (Exception e) {
-                // ignore right now
             }
-        }
-//        @Override
-//        public void onCreateContextMenu(ContextMenu menu, View v, ContextMenu.ContextMenuInfo menuInfo) {
-//            menu.setHeaderTitle(R.string.select_option);
-//            menu.add(0, RENAME_ITEM, 0, R.string.rename);//groupId, itemId, order, title
-//            menu.add(0, DELETE_ITEM, 1, R.string.delete);
-//        }
-//
+
 
         @Override
         public boolean onLongClick(View v) {
             int position = getAdapterPosition();
 
             ModifyItemDialog modifyItemDialog = new ModifyItemDialog();
-            modifyItemDialog.setItemToModify( product, position);
+            modifyItemDialog.setItemToModify( product.get(position));
             modifyItemDialog.show(context.getFragmentManager(), "Modify item");
             return true;
         }

@@ -30,7 +30,7 @@ public class SharingListService extends FirebaseMessagingService {
         sendNotification(remoteMessage.getNotification().getBody());
         }
 
-    private void sendNotification(String messageBody) {
+    public void sendNotification(String messageBody) {
         Intent intent = new Intent(this, MainScreen.class);
         intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
 
