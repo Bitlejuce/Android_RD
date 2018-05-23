@@ -178,7 +178,8 @@ public class FindUserToShareList extends BaseActivity implements View.OnClickLis
         mUserDatabase.child(chosenUser.getUserId()).child("sharedlists").child(sharedList.getSharedListName()).setValue(sharedList).addOnSuccessListener(new OnSuccessListener<Void>() {
             @Override
             public void onSuccess(Void aVoid) {
-                Toast.makeText(FindUserToShareList.this, "List available  to " +  chosenUser.getName() + " now!", Toast.LENGTH_SHORT).show();
+                Toast.makeText(FindUserToShareList.this, getString(R.string.list_available_to) + "  " +
+                        chosenUser.getName() + "  " + getString(R.string.now), Toast.LENGTH_SHORT).show();
             }
         });
         }

@@ -1,14 +1,15 @@
 <PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android">
 
     <ListPreference
-        android:defaultValue="1"
+        android:defaultValue="@null"
         android:entries="@array/chose_language_array_titles"
         android:entryValues="@array/chose_language_array_values"
         android:key="language_settings"
         android:negativeButtonText="@string/cancel"
         android:positiveButtonText="@null"
         android:title="@string/chose_language"
-        android:enabled="false"/>
+
+        android:enabled="true"/>
 
     <CheckBoxPreference
         android:defaultValue="false"

@@ -3,14 +3,19 @@ package com.shoppinglist.rdproject.shoppinglist;
 import android.os.Parcel;
 import android.os.Parcelable;
 
+import com.google.firebase.database.IgnoreExtraProperties;
+
 import java.io.Serializable;
 import java.util.Objects;
-
+@IgnoreExtraProperties
 public class SharedList implements Serializable {
+    public static final int ALREADY_SHOWED = 1;
+    public static final int NOT_YET_SHOWED = 0;
     private String sharedListName;
     private String fromUserName;
     private String fromUserEmail;
     private String fromUserId;
+    private int showedToUser;
 
     public SharedList() {
     }
@@ -20,6 +25,14 @@ public class SharedList implements Serializable {
         this.fromUserName = fromUserName;
         this.fromUserEmail = fromUserEmail;
         this.fromUserId = fromUserId;
+    }
+
+    public int getShowedToUser() {
+        return showedToUser;
+    }
+
+    public void setShowedToUser(int showedToUser) {
+        this.showedToUser = showedToUser;
     }
 
     public String getSharedListName() {

@@ -1,8 +1,13 @@
 package com.shoppinglist.rdproject.shoppinglist;
 
+import android.app.NotificationManager;
+import android.app.PendingIntent;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.content.res.Configuration;
+import android.content.res.Resources;
+import android.media.RingtoneManager;
 import android.net.Uri;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
@@ -10,6 +15,7 @@ import android.provider.Settings;
 import android.support.annotation.NonNull;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.NavigationView;
+import android.support.v4.app.NotificationCompat;
 import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarDrawerToggle;
@@ -17,6 +23,7 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
+import android.util.DisplayMetrics;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -54,6 +61,7 @@ import java.util.Comparator;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 
 import jp.wasabeef.picasso.transformations.CropCircleTransformation;
@@ -207,8 +215,10 @@ public class MainScreen extends AppCompatActivity
                     if (product.getStatus() == 0) {
                         shoppingList.add(index, product);
                         rAdapterToDo.notifyDataSetChanged();
+                        rAdapterDone.notifyDataSetChanged();
                     } else {
                         doneList.add(0, product);
+                        rAdapterToDo.notifyDataSetChanged();
                         rAdapterDone.notifyDataSetChanged();
                     }
                     return;
@@ -220,8 +230,10 @@ public class MainScreen extends AppCompatActivity
                     if (product.getStatus() == 0) {
                         shoppingList.add(0, product);
                         rAdapterToDo.notifyDataSetChanged();
+                        rAdapterDone.notifyDataSetChanged();
                     } else {
                         doneList.add(index, product);
+                        rAdapterToDo.notifyDataSetChanged();
                         rAdapterDone.notifyDataSetChanged();
                     }
                 }
@@ -260,6 +272,26 @@ public class MainScreen extends AppCompatActivity
 
     }
 
+    public void sendNotification(String messageBody) {
+        Intent intent = new Intent(this, MainScreen.class);
+        intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+
+        Uri defaultSoundUri= RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION);
+
+        NotificationCompat.Builder notificationBuilder = new NotificationCompat.Builder(this)
+                .setSmallIcon(R.mipmap.ic_launcher)
+                .setContentIntent(PendingIntent.getActivity(this, 0, intent, 0))
+                .setContentTitle(this.getString(R.string.app_name))
+                .setContentText(messageBody)
+                .setAutoCancel(true)
+                .setSound(defaultSoundUri);
+
+        NotificationManager notificationManager =
+                (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
+
+        notificationManager.notify(0, notificationBuilder.build());
+    }
+
     public void loadSharedLists(){
 
         ChildEventListener sharedChildEventListener = new ChildEventListener() {
@@ -268,14 +300,19 @@ public class MainScreen extends AppCompatActivity
                 SharedList sharedList = dataSnapshot.getValue(SharedList.class);
                 String sharedListName = sharedList.getSharedListName();
                 String fromUserName = sharedList.getFromUserName();
+
+                if (sharedList.getShowedToUser() == SharedList.NOT_YET_SHOWED) {
+                    //String fromUserEmail = sharedList.getFromUserEmail();
+                    String messageBody = fromUserName + " "  +
+                            getString(R.string.want_to_share_list) + sharedListName;
+                    sendNotification(messageBody);
+                    sharedList.setShowedToUser(SharedList.ALREADY_SHOWED);
+                    databaseRef.child(userId).child("sharedlists").child(sharedList.getSharedListName()).setValue(sharedList);
+                }
+
                 if (!sharedLists.contains(sharedList)) {
                     sharedLists.add(sharedList);
                 }
-//                String fromUserEmail = sharedList.getFromUserEmail();
-//                SharingListService notifyService = new SharingListService();
-//                String messageBody = fromUserName + " (" + fromUserEmail + ") " +
-//                        getString(R.string.want_to_share_list) + sharedListName;
-                //notifyService.sendNotification(messageBody);
             }
 
             @Override
@@ -434,7 +471,7 @@ public class MainScreen extends AppCompatActivity
         switch (item.getItemId()) {
             case R.id.share:
                 if (mAuth.getCurrentUser() == null){
-                       Toast.makeText(this, "You must sign in to share list!", Toast.LENGTH_SHORT).show();
+                       Toast.makeText(this, R.string.must_sign_in_to_share, Toast.LENGTH_SHORT).show();
                     return false;
                 }
                 SharedList sharedList = new SharedList(listName, localUser.getName(), localUser.getEmail(), userId);
@@ -486,7 +523,7 @@ public class MainScreen extends AppCompatActivity
         } else if (id == R.id.check_shared) {
             Log.d(TAG, "sharedLists.size =    "  + sharedLists.size() );
             if (sharedLists.isEmpty()) {
-                Toast.makeText(this, "No list available", Toast.LENGTH_SHORT).show();
+                Toast.makeText(this, R.string.no_list_available, Toast.LENGTH_SHORT).show();
                 return true;
             }
             new ChooseSharedListDialog().show(getFragmentManager(), "ChooseSharedListDialog");
@@ -562,6 +599,7 @@ public class MainScreen extends AppCompatActivity
              localUser = initializeLocalUser(currentUser);
             fillUserDatails(localUser);
         }
+        preferenceChecker();
         Log.d(TAG, "onStart called   isAdsfree = " + isAdsfree +"  isAdsfreeForNow =   " + isAdsfreeForNow);
         Log.d(TAG, "listOfListsToDisplay = " + listOfListsToDisplay +"  mapOfLists =   " + mapOfLists);
     }
@@ -595,7 +633,7 @@ public class MainScreen extends AppCompatActivity
         preferenceChecker();
         super.onResume();
     }
-            // to check out if lock screen mode on/off
+            // to check out if lock screen mode on/off and lang
     private void preferenceChecker() {
         SharedPreferences sp = PreferenceManager.getDefaultSharedPreferences(this);
         if (sp.getBoolean("lock_screen", false)) {
@@ -603,6 +641,25 @@ public class MainScreen extends AppCompatActivity
         }else {
             getWindow().addFlags(WindowManager.LayoutParams.FLAG_ALLOW_LOCK_WHILE_SCREEN_ON);
         }
+        String localPref = sp.getString("language_settings", "1");
+        String localCode;
+        switch (localPref){
+            case "1" : localCode = "en";
+            break;
+            case "0" : localCode = "ru";
+            break;
+            default: localCode = "en";
+        }
+       setLocale(localCode);
+    }
+
+    public void setLocale(String lang) {
+        Locale myLocale = new Locale(lang);
+        Resources res = getResources();
+        DisplayMetrics dm = res.getDisplayMetrics();
+        Configuration conf = res.getConfiguration();
+        conf.locale = myLocale;
+        res.updateConfiguration(conf, dm);
     }
 
     @Override

@@ -31,6 +31,7 @@ import com.google.android.gms.ads.reward.RewardedVideoAd;
 import com.google.android.gms.ads.reward.RewardedVideoAdListener;
 
 import java.util.List;
+import java.util.Locale;
 
 public class SettingsActivity extends AppCompatPreferenceActivity {
     public static final String ADMOB_VIDEO_ID = "ca-app-pub-8462980126781299/7163924058";
@@ -56,6 +57,12 @@ public class SettingsActivity extends AppCompatPreferenceActivity {
                         index >= 0
                                 ? listPreference.getEntries()[index]
                                 : null);
+                        // if lang is changed show toast
+                if (!PreferenceManager.getDefaultSharedPreferences(preference.getContext()).getString("language_settings", "1").equals(stringValue)) {
+                    Toast.makeText(preference.getContext(),
+                            preference.getContext().getResources().getString(R.string.need_restart),
+                            Toast.LENGTH_SHORT).show();
+                }
 
             } else if (preference instanceof RingtonePreference) {
                 // For ringtone preferences, look up the correct display value
@@ -104,13 +111,12 @@ public class SettingsActivity extends AppCompatPreferenceActivity {
                 & Configuration.SCREENLAYOUT_SIZE_MASK) >= Configuration.SCREENLAYOUT_SIZE_XLARGE;
     }
 
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setTitle(R.string.action_settings);
         setupActionBar();
-        MobileAds.initialize(this, ADMOB_TEST_VIDEO_ID);
+        MobileAds.initialize(this, ADMOB_VIDEO_ID);
         mRewardedVideoAd = MobileAds.getRewardedVideoAdInstance(this);
         mRewardedVideoAd.setRewardedVideoAdListener(new RewardedVideoAdListener() {
             @Override
@@ -130,7 +136,7 @@ public class SettingsActivity extends AppCompatPreferenceActivity {
 
             @Override
             public void onRewardedVideoAdClosed() {
-                Toast.makeText(SettingsActivity.this, "Sorry you must watch full video!", Toast.LENGTH_SHORT).show();
+                //Toast.makeText(SettingsActivity.this, "Sorry you must watch full video!", Toast.LENGTH_SHORT).show();
             }
 
             @Override
@@ -150,7 +156,7 @@ public class SettingsActivity extends AppCompatPreferenceActivity {
 
             @Override
             public void onRewardedVideoCompleted() {
-                Toast.makeText(SettingsActivity.this, "Thank you!", Toast.LENGTH_SHORT).show();
+                Toast.makeText(SettingsActivity.this, R.string.thank_you, Toast.LENGTH_SHORT).show();
                 MainScreen.isAdsfreeForNow = true;
             }
         });
@@ -177,7 +183,7 @@ public class SettingsActivity extends AppCompatPreferenceActivity {
     }
 
     private static void loadRewardedVideoAd() {
-        mRewardedVideoAd.loadAd(ADMOB_TEST_VIDEO_ID,
+        mRewardedVideoAd.loadAd(ADMOB_VIDEO_ID,
                 new AdRequest.Builder().build());
     }
     /**
@@ -285,9 +291,6 @@ public class SettingsActivity extends AppCompatPreferenceActivity {
                 }
             });
 
-
         }
-
-
     }
 }
