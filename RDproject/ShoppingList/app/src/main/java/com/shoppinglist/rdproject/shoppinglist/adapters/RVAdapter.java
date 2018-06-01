@@ -1,6 +1,7 @@
 package com.shoppinglist.rdproject.shoppinglist.adapters;
 
 import android.app.Activity;
+import android.content.Context;
 import android.support.design.widget.Snackbar;
 import android.support.v7.widget.CardView;
 import android.support.v7.widget.RecyclerView;
@@ -16,8 +17,11 @@ import com.shoppinglist.rdproject.shoppinglist.MainScreen;
 import com.shoppinglist.rdproject.shoppinglist.Product;
 import com.shoppinglist.rdproject.shoppinglist.R;
 import com.shoppinglist.rdproject.shoppinglist.dialogs.ModifyItemDialog;
+import com.shoppinglist.rdproject.shoppinglist.modules.App;
 
 import java.util.List;
+
+import javax.inject.Inject;
 
 
 public class RVAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder>{
@@ -28,13 +32,13 @@ public class RVAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder>{
     public static final int STATUS_DONE = 1;
     private List<Product> product;
     private int layoutId;
+
     private Activity context;
     public List<Product> getProductList() {
         return product;
     }
 
     public RVAdapter(Activity context, List<Product> product, int layoutId){
-
         this.product = product;
         this.layoutId = layoutId;
         this.context = context;
@@ -143,7 +147,7 @@ public class RVAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder>{
 
             ModifyItemDialog modifyItemDialog = new ModifyItemDialog();
             modifyItemDialog.setItemToModify( product.get(position));
-            modifyItemDialog.show(context.getFragmentManager(), "Modify item");
+            modifyItemDialog.show(((Activity)context).getFragmentManager(), "Modify item");
             return true;
         }
     }

@@ -44,12 +44,11 @@ import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
-import com.google.firebase.database.ValueEventListener;
 import com.shoppinglist.rdproject.shoppinglist.adapters.RVAdapter;
 import com.shoppinglist.rdproject.shoppinglist.dialogs.*;
 import com.shoppinglist.rdproject.shoppinglist.login.LoginActivity;
 import com.shoppinglist.rdproject.shoppinglist.login.User;
-import com.shoppinglist.rdproject.shoppinglist.service.SharingListService;
+import com.shoppinglist.rdproject.shoppinglist.modules.App;
 import com.squareup.picasso.Picasso;
 
 import org.json.JSONException;
@@ -63,6 +62,8 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
+
+import javax.inject.Inject;
 
 import jp.wasabeef.picasso.transformations.CropCircleTransformation;
 
@@ -83,11 +84,12 @@ public class MainScreen extends AppCompatActivity
 
     public static boolean isAdsfree = false;
     public static boolean isAdsfreeForNow = false;
-    private static int listCounter;
 
     private User localUser;
     public String userId;
-    private SharedPreferences mSettings;
+
+    @Inject
+    SharedPreferences mSettings;
     private RecyclerView rViewToDo;
     private RecyclerView rViewDone;
     private RVAdapter rAdapterToDo;
@@ -101,11 +103,14 @@ public class MainScreen extends AppCompatActivity
     private Map<String, String> mapOfLists;
     private Spinner chooseListSpinner;
     private ArrayAdapter<String> spinnerAdapter;
-    private DrawerLayout drawer;
-    private FirebaseAuth mAuth;
-    private FirebaseDatabase database;
+
+    @Inject
+    FirebaseAuth mAuth;
+    @Inject
+    FirebaseDatabase database;
     public DatabaseReference databaseRef;
 
+    private DrawerLayout drawer;
     private ImageView userPicView;
     private TextView userNameView;
     private TextView userMailView;
@@ -140,24 +145,18 @@ public class MainScreen extends AppCompatActivity
         // end of template
         // start code
         isAdsfreeForNow = false;
-        mSettings = getSharedPreferences(APP_PREFERENCES, Context.MODE_PRIVATE);
+
+        ((App)getApplicationContext()).getAppComponent().inject(this);
+
         userId =  Settings.Secure.getString(this.getContentResolver(), Settings.Secure.ANDROID_ID);
-        //userId =  "00000000000000000000000000000000000000000000000000000000000";
-        mAuth = FirebaseAuth.getInstance();
-        database = FirebaseDatabaseUtil.getDatabase();
 
         loadPreferences();
         bindUserViews();
 
-        rViewToDo = findViewById(R.id.lis_to_do);
-        rViewToDo.setHasFixedSize(true);
-        rViewToDo.setLayoutManager(new LinearLayoutManager(this));
+
         rAdapterToDo = new RVAdapter(this, shoppingList, R.id.lis_to_do);
         rViewToDo.setAdapter(rAdapterToDo);
 
-        rViewDone = findViewById(R.id.list_done);
-        rViewDone.setHasFixedSize(true);
-        rViewDone.setLayoutManager(new LinearLayoutManager(this));
         rAdapterDone = new RVAdapter(this, doneList, R.id.list_done);
         rViewDone.setAdapter(rAdapterDone);
 
@@ -648,6 +647,8 @@ public class MainScreen extends AppCompatActivity
             break;
             case "0" : localCode = "ru";
             break;
+            case "2" : localCode = "cs";
+            break;
             default: localCode = "en";
         }
        setLocale(localCode);
@@ -674,6 +675,12 @@ public class MainScreen extends AppCompatActivity
     }
 
     private void bindUserViews() {
+        rViewToDo = findViewById(R.id.lis_to_do);
+        rViewToDo.setHasFixedSize(true);
+        rViewToDo.setLayoutManager(new LinearLayoutManager(this));
+        rViewDone = findViewById(R.id.list_done);
+        rViewDone.setHasFixedSize(true);
+        rViewDone.setLayoutManager(new LinearLayoutManager(this));
         NavigationView mNavigationView = (NavigationView) findViewById(R.id.nav_view_header_only);
         View mHeaderView = mNavigationView.getHeaderView(0);
         NavigationView navMenuView = (NavigationView) findViewById(R.id.nav_view);
