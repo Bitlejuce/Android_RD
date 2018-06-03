@@ -90,7 +90,7 @@
     <string name="no_list_available">Нет доступных списков</string>
     <string name="thank_you">Спасибо!</string>
     <string name="need_restart">Перезапустите приложение, чтобы изменения вступили в силу</string>
-    <string name="must_sign_in_to_share">Вы должни быть авторизированы, чтобы делиться списками!</string>
+    <string name="must_sign_in_to_share">Вы должны быть авторизированы, чтобы делиться списками!</string>
     <string name="want_to_share_list">хочет поделиться списком:</string>
     <string name="list_available_to">Список теперь доступен пользователю </string>
     <string name="now"> !</string>
