@@ -8,6 +8,7 @@ import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.v4.app.ActivityCompat;
 import android.support.v7.app.AppCompatActivity;
+import android.text.method.LinkMovementMethod;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
@@ -17,10 +18,8 @@ import android.widget.Toast;
 import com.google.android.gms.common.GooglePlayServicesNotAvailableException;
 import com.google.android.gms.common.GooglePlayServicesRepairableException;
 import com.google.android.gms.common.api.Status;
-import com.google.android.gms.location.places.GeoDataClient;
 import com.google.android.gms.location.places.Place;
 import com.google.android.gms.location.places.PlaceDetectionClient;
-import com.google.android.gms.location.places.PlaceLikelihood;
 import com.google.android.gms.location.places.PlaceLikelihoodBufferResponse;
 import com.google.android.gms.location.places.Places;
 import com.google.android.gms.location.places.ui.PlaceAutocomplete;
@@ -34,8 +33,6 @@ import butterknife.OnClick;
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
-import retrofit2.Retrofit;
-import retrofit2.converter.gson.GsonConverterFactory;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -43,8 +40,6 @@ public class MainActivity extends AppCompatActivity {
     private static final String TAG = "MainActivity";
     public static final int PLACE_AUTOCOMPLETE_REQUEST_CODE = 101;
     public static final int REQUEST_PLACE_PICKER = 102;
-
-
 
     private PlaceDetectionClient mPlaceDetectionClient;
 
@@ -60,6 +55,8 @@ public class MainActivity extends AppCompatActivity {
     Button onMapBtn;
     @BindView(R.id.location)
     TextView location;
+    @BindView(R.id.sunrise_sunset)
+    TextView sunriseSunset;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -67,6 +64,7 @@ public class MainActivity extends AppCompatActivity {
         setContentView(R.layout.activity_main);
         ButterKnife.bind(this);
 
+        sunriseSunset.setMovementMethod(LinkMovementMethod.getInstance());
         mPlaceDetectionClient = Places.getPlaceDetectionClient(this, null);
     }
 
@@ -108,7 +106,7 @@ public class MainActivity extends AppCompatActivity {
 
         if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
             Toast.makeText(this, "No permission!", Toast.LENGTH_SHORT).show();
-            ActivityCompat.requestPermissions(this, new String[] {Manifest.permission.ACCESS_FINE_LOCATION}, 123);
+            ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.ACCESS_FINE_LOCATION}, 123);
             return;
         }
 
@@ -160,32 +158,21 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void getSunRiseAndSetinfoFromApi(String latitude, String longitude) {
-        Log.d(TAG, "Start getSunRiseAndSetinfoFromApi method");
-        Log.d(TAG, "String latitude = " + latitude);
-        Log.d(TAG, "String longitude = " + longitude);
 
-        Toast.makeText(MainActivity.this, "Start getSunRiseAndSetinfoFromApi method", Toast.LENGTH_SHORT).show();
         App.getApi().getTimeInfo(latitude, longitude).enqueue(new Callback<TimeInfo>() {
             @Override
             public void onResponse(Call<TimeInfo> call, Response<TimeInfo> response) {
                 TimeInfo timeInfo = response.body();
-                if (timeInfo != null ) {
-                    Log.d(TAG, "timeInfo != null ");
-                    Log.d(TAG, "timeInfo   " + timeInfo.toString());
-                    String sunriseTime = timeInfo.getSunrise();
-                    String sunsetTime = timeInfo.getSunset();
-
-                    Log.d(TAG, "timeInfo.getSunrise() =  " + timeInfo.getSunrise());
-                    Log.d(TAG, "timeInfo.getSunset() =  " + timeInfo.getSunset());
-
-                    sunrise.setText(sunriseTime);
-                    sunset.setText(sunsetTime);
-                }else {
+                if (timeInfo != null) {
+                    sunrise.setText(timeInfo.getResults().getSunrise());
+                    sunset.setText(timeInfo.getResults().getSunset());
+                } else {
                     Log.d(TAG, "timeInfo == null ");
                     sunrise.setText("-");
                     sunset.setText("-");
                 }
             }
+
             @Override
             public void onFailure(Call<TimeInfo> call, Throwable t) {
                 Toast.makeText(MainActivity.this, "Cannot find sunrise/sunset for your location", Toast.LENGTH_SHORT).show();

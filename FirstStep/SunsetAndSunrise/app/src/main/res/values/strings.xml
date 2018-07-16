@@ -8,4 +8,7 @@
     <string name="line">-</string>
     <string name="sunset">sunset</string>
     <string name="sunrise">sunrise</string>
+    <string name="https_sunrise_sunset_org">
+        <a href = "https://sunrise-sunset.org"> We use free sunset/sunrise API </a>
+    </string>
 </resources>
