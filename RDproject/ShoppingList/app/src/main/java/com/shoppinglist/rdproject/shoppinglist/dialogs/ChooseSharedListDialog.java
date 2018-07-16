@@ -7,7 +7,6 @@ import android.content.DialogInterface;
 import android.os.Bundle;
 import android.support.v7.app.AlertDialog;
 import android.view.WindowManager;
-import android.widget.Toast;
 
 import com.google.firebase.database.FirebaseDatabase;
 import com.shoppinglist.rdproject.shoppinglist.MainScreen;

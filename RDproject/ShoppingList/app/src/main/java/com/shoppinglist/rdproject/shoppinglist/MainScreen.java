@@ -5,6 +5,9 @@ import android.app.PendingIntent;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.content.pm.PackageInfo;
+import android.content.pm.PackageManager;
+import android.content.pm.Signature;
 import android.content.res.Configuration;
 import android.content.res.Resources;
 import android.media.RingtoneManager;
@@ -23,6 +26,7 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
+import android.util.Base64;
 import android.util.DisplayMetrics;
 import android.util.Log;
 import android.view.Menu;
@@ -45,7 +49,13 @@ import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.shoppinglist.rdproject.shoppinglist.adapters.RVAdapter;
-import com.shoppinglist.rdproject.shoppinglist.dialogs.*;
+import com.shoppinglist.rdproject.shoppinglist.dialogs.AddDialog;
+import com.shoppinglist.rdproject.shoppinglist.dialogs.AddListDialog;
+import com.shoppinglist.rdproject.shoppinglist.dialogs.ChooseListDialog;
+import com.shoppinglist.rdproject.shoppinglist.dialogs.ChooseSharedListDialog;
+import com.shoppinglist.rdproject.shoppinglist.dialogs.ModifyItemDialog;
+import com.shoppinglist.rdproject.shoppinglist.dialogs.ModifyListDialog;
+import com.shoppinglist.rdproject.shoppinglist.dialogs.RenameListDialog;
 import com.shoppinglist.rdproject.shoppinglist.login.LoginActivity;
 import com.shoppinglist.rdproject.shoppinglist.login.User;
 import com.shoppinglist.rdproject.shoppinglist.modules.App;
@@ -54,6 +64,8 @@ import com.squareup.picasso.Picasso;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.security.MessageDigest;
+import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
@@ -88,8 +100,6 @@ public class MainScreen extends AppCompatActivity
     private User localUser;
     public String userId;
 
-    @Inject
-    SharedPreferences mSettings;
     private RecyclerView rViewToDo;
     private RecyclerView rViewDone;
     private RVAdapter rAdapterToDo;
@@ -104,6 +114,8 @@ public class MainScreen extends AppCompatActivity
     private Spinner chooseListSpinner;
     private ArrayAdapter<String> spinnerAdapter;
 
+    @Inject
+    SharedPreferences mSettings;
     @Inject
     FirebaseAuth mAuth;
     @Inject
@@ -169,6 +181,8 @@ public class MainScreen extends AppCompatActivity
         loadSharedLists();
 
         Log.d(TAG, "end of onCreate   " +  FacebookSdk.getApplicationSignature(getApplicationContext()));
+
+        //getHashKey();
     }
 
     private void loadData(String path) {
@@ -555,7 +569,9 @@ public class MainScreen extends AppCompatActivity
                     String userMail = data.getStringExtra("userMail");
                     Uri userPic = data.getParcelableExtra("userPic");
 
-                localUser = new User(userName, userMail, userPic.toString());
+                    String userPicLink = userPic == null ? null : userPic.toString();
+
+                localUser = new User(userName, userMail, userPicLink);
                     fillUserDatails(localUser);
                 }
             }
@@ -777,5 +793,21 @@ public class MainScreen extends AppCompatActivity
     public List<SharedList> getSharedLists() {
         return sharedLists;
     }
+    private void getHashKey() {
+        try {
+            PackageInfo info = getPackageManager().getPackageInfo(
+                    "com.shoppinglist.rdproject.shoppinglist",
+                    PackageManager.GET_SIGNATURES);
+            for (Signature signature : info.signatures) {
+                MessageDigest md = MessageDigest.getInstance("SHA");
+                md.update(signature.toByteArray());
+                Log.d("KeyHash:", Base64.encodeToString(md.digest(), Base64.DEFAULT));
+            }
+        } catch (PackageManager.NameNotFoundException e) {
 
+
+        } catch (NoSuchAlgorithmException e) {
+
+        }
+    }
 }

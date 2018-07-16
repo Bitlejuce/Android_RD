@@ -14,8 +14,6 @@ import android.widget.EditText;
 import com.shoppinglist.rdproject.shoppinglist.Product;
 import com.shoppinglist.rdproject.shoppinglist.R;
 
-import java.util.List;
-
 public class ModifyItemDialog extends DialogFragment {
 
         private EditText inputListName;

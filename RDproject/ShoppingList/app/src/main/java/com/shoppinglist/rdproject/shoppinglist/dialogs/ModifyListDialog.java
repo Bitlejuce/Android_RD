@@ -6,12 +6,8 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.os.Bundle;
 import android.support.v7.app.AlertDialog;
-import android.view.WindowManager;
 
-import com.shoppinglist.rdproject.shoppinglist.MainScreen;
 import com.shoppinglist.rdproject.shoppinglist.R;
-
-import java.util.List;
 
 public class ModifyListDialog extends DialogFragment {
     public OnModifyListListener onModifyListListener;

@@ -28,7 +28,7 @@ public class CalcHelper {
     }
 
     public String simpleOperation(String currentNumber1, String currentOperation) {
-        BigDecimal num1 = new BigDecimal(currentNumber1);
+        BigDecimal num1 = new BigDecimal(currentNumber1.replaceAll(" ",""));
         BigDecimal result = new BigDecimal("0");
 
         switch (currentOperation) {

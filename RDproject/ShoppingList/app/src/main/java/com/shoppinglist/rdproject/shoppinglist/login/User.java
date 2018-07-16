@@ -1,7 +1,5 @@
 package com.shoppinglist.rdproject.shoppinglist.login;
 
-import android.net.Uri;
-
 import java.util.Objects;
 
 public class User {

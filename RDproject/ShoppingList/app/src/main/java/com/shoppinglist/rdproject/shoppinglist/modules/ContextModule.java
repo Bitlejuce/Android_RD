@@ -2,7 +2,6 @@ package com.shoppinglist.rdproject.shoppinglist.modules;
 
 import android.content.Context;
 
-
 import dagger.Module;
 import dagger.Provides;
 

@@ -309,7 +309,11 @@ public class MainActivity extends AppCompatActivity {
             text = clearLastNum();
             switch (operation) {
                 case "x2":
+                    try {
                     text = calcHelper.simpleOperation(text, "x2");
+                    } catch (Exception e) {
+                        //MainActivity.showToast(this, "Opa-4ike");
+                    }
                     break;
                 case "sqrt":
                     try {

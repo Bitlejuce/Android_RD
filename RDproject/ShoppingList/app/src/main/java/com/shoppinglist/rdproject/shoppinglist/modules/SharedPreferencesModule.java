@@ -1,11 +1,7 @@
 package com.shoppinglist.rdproject.shoppinglist.modules;
 
-import android.app.Application;
 import android.content.Context;
 import android.content.SharedPreferences;
-
-import javax.inject.Inject;
-import javax.inject.Singleton;
 
 import dagger.Module;
 import dagger.Provides;
