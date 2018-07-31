@@ -4,6 +4,7 @@
     android:layout_height="wrap_content"
     android:id="@+id/add_product">
 
+
     <TextView
         android:id="@+id/head"
         android:layout_width="match_parent"
@@ -15,6 +16,10 @@
         android:text="@string/enter_the_name_of_product"
         android:textColorLink="@color/colorAccent" />
 
+    <android.support.design.widget.TextInputLayout
+        android:id="@+id/input_layout_name"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
     <EditText
         android:id="@+id/enter_text"
         android:layout_width="match_parent"
@@ -30,6 +35,13 @@
         android:textSize="8pt">
     </EditText>
 
+</android.support.design.widget.TextInputLayout>
+
+    <android.support.design.widget.TextInputLayout
+        android:id="@+id/input_layout_qty"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+
     <EditText
         android:id="@+id/enter_quantity"
         android:layout_width="match_parent"
@@ -43,8 +55,9 @@
         android:hint="@string/enter_quantity"
         android:inputType="numberDecimal"
         android:textSize="8pt"
-
         />
+
+    </android.support.design.widget.TextInputLayout>
 
 
     <LinearLayout

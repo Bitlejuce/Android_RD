@@ -15,6 +15,10 @@
         android:text="@string/rename_list_header"
         android:textColorLink="@color/colorAccent" />
 
+    <android.support.design.widget.TextInputLayout
+        android:id="@+id/input_layout_newlistname"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
     <EditText
         android:id="@+id/enter_list_name"
         android:layout_width="match_parent"
@@ -29,6 +33,7 @@
         android:inputType="textCapSentences"
         android:textSize="8pt">
     </EditText>
+</android.support.design.widget.TextInputLayout>
 
 
     <LinearLayout
