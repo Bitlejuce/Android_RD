@@ -71,7 +71,7 @@
 <string name="pref_title_block_screen">Disable auto lock screen</string>
 <string name="pref_log_out_on_exit">Log out on exit</string>
 <string name="remove_ads_completely">Remove ads completely</string>
-<string name="app_version">2.11</string>
+<string name="app_version">2.12</string>
 <string name="title_version">Version</string>
 <string name="contact_us">Contact</string>
 <string name="watch_ads_video">Watch ads video</string>

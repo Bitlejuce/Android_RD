@@ -73,7 +73,7 @@
     <string name="pref_title_block_screen">Запретить автоблокировку экрана</string>
     <string name="pref_log_out_on_exit">Выход из аккаунта при закрытии</string>
     <string name="remove_ads_completely">Полностью удалить рекламу</string>
-    <string name="app_version">2.11</string>
+    <string name="app_version">2.12</string>
     <string name="title_version">Версия</string>
     <string name="contact_us">Контакты</string>
     <string name="watch_ads_video">Смотреть рекламный ролик</string>

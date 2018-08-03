@@ -14,7 +14,7 @@ public class App extends Application {
     public void onCreate() {
         super.onCreate();
 
-        Retrofit retrofit = new Retrofit.Builder()
+         retrofit = new Retrofit.Builder()
                 .baseUrl("https://api.sunrise-sunset.org/")
                 .addConverterFactory(GsonConverterFactory.create())
                 .build();
