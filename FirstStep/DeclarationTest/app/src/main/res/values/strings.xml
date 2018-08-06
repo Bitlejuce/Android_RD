@@ -3,4 +3,12 @@
     <string name="title_home">Home</string>
     <string name="title_dashboard">Dashboard</string>
     <string name="title_notifications">Notifications</string>
+    <string name="position">Посада:</string>
+    <string name="position_name">Position Name</string>
+    <string name="patronymic">Patronymic</string>
+    <string name="pdf">PDF</string>
+    <string name="favorites">favorites</string>
+    <string name="first_second_name">First Second Name</string>
+    <string name="title">Державний реєстр декларацій</string>
+    <string name="field_cannot_be_empty">Поле не може бути пустим!</string>
 </resources>

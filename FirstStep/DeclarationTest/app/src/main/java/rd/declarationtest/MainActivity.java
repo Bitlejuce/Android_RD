@@ -4,18 +4,15 @@ import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.design.widget.BottomNavigationView;
 import android.support.v7.app.AppCompatActivity;
-import android.support.v7.widget.PopupMenu;
-import android.support.v7.widget.Toolbar;
-import android.text.Editable;
-import android.text.TextWatcher;
-import android.util.Log;
-import android.view.Gravity;
 import android.view.MenuItem;
-import android.widget.TextView;
 import android.widget.Toast;
 
 import com.mancj.materialsearchbar.MaterialSearchBar;
 
+import java.util.ArrayList;
+import java.util.List;
+
+import rd.declarationtest.pojo.Item;
 import rd.declarationtest.pojo.NazkGovResult;
 import retrofit2.Call;
 import retrofit2.Callback;
@@ -43,6 +40,8 @@ public class MainActivity extends AppCompatActivity {
         }
     };
     private MaterialSearchBar searchBar;
+    private List<Item> personList = new ArrayList<>();
+    private List<Item> favoriteList = new ArrayList<>();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -52,7 +51,7 @@ public class MainActivity extends AppCompatActivity {
         BottomNavigationView navigation = (BottomNavigationView) findViewById(R.id.navigation);
         navigation.setOnNavigationItemSelectedListener(mOnNavigationItemSelectedListener);
         //todo extract string resource
-        setTitle("Державний реєстр декларацій");
+        setTitle(getString(R.string.title));
 
         searchBar = (MaterialSearchBar) findViewById(R.id.searchBar);
         searchBar.setOnSearchActionListener(new MaterialSearchBar.OnSearchActionListener() {
@@ -64,7 +63,7 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onSearchConfirmed(CharSequence text) {
                 if (text.toString().isEmpty()){
-                    Toast.makeText(MainActivity.this, "Поле не може бути пустим!", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(MainActivity.this, R.string.field_cannot_be_empty, Toast.LENGTH_SHORT).show();
                 }else {
                     searchResult(text.toString());
                 }
@@ -72,32 +71,8 @@ public class MainActivity extends AppCompatActivity {
 
             @Override
             public void onButtonClicked(int buttonCode) {
-                switch (buttonCode){
-                    case MaterialSearchBar.BUTTON_NAVIGATION:
-                        Toast.makeText(MainActivity.this, "public void onButtonClicked(int buttonCode)", Toast.LENGTH_SHORT).show();
-                        break;
-                }
             }
         });
-//        searchBar.inflateMenu(R.menu.main);
-//
-//        searchBar.getMenu().setOnMenuItemClickListener(new PopupMenu.OnMenuItemClickListener() {
-//            @Override
-//            public boolean onMenuItemClick(MenuItem item) {
-//                switch (item.getItemId()) {
-//                    case 1:
-//                        Toast.makeText(MainActivity.this, "Hello", Toast.LENGTH_SHORT).show();
-//                    break;
-//                    case 2:
-//                        break;
-//                    case 3:
-//                        break;
-//
-//                }
-//                return false;
-//            }
-//        });
-        //setSupportActionBar((Toolbar)findViewById(R.id.custom_toolbar));
     }
     private void searchResult (String searchText) {
         searchBar.setPlaceHolder(searchText);
@@ -121,9 +96,10 @@ public class MainActivity extends AppCompatActivity {
         });
     }
 
+
+    //
     @Override
     public void onBackPressed() {
-
         super.onBackPressed();
         //searchBar.disableSearch();
     }
