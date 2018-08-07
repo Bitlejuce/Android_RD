@@ -4,6 +4,9 @@ import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.design.widget.BottomNavigationView;
 import android.support.v7.app.AppCompatActivity;
+import android.support.v7.widget.LinearLayoutManager;
+import android.support.v7.widget.RecyclerView;
+import android.util.Log;
 import android.view.MenuItem;
 import android.widget.Toast;
 
@@ -19,6 +22,7 @@ import retrofit2.Callback;
 import retrofit2.Response;
 
 public class MainActivity extends AppCompatActivity {
+    public static final String TAG = "MainActivity";
 
     private BottomNavigationView.OnNavigationItemSelectedListener mOnNavigationItemSelectedListener
             = new BottomNavigationView.OnNavigationItemSelectedListener() {
@@ -42,6 +46,17 @@ public class MainActivity extends AppCompatActivity {
     private MaterialSearchBar searchBar;
     private List<Item> personList = new ArrayList<>();
     private List<Item> favoriteList = new ArrayList<>();
+    private RecyclerView mainView;
+    private RVadapter rVadapter;
+    public List<Item> getFavoriteList() {
+        return favoriteList;
+    }
+    public List<Item> getPersonList() {
+        return personList;
+    }
+    public RVadapter getrVadapter() {
+        return rVadapter;
+    }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -52,6 +67,12 @@ public class MainActivity extends AppCompatActivity {
         navigation.setOnNavigationItemSelectedListener(mOnNavigationItemSelectedListener);
         //todo extract string resource
         setTitle(getString(R.string.title));
+        mainView = findViewById(R.id.recycler_view);
+        //mainView.setHasFixedSize(true);
+        mainView.setLayoutManager(new LinearLayoutManager(this));
+        rVadapter = new RVadapter(this);
+        mainView.setAdapter(rVadapter);
+
 
         searchBar = (MaterialSearchBar) findViewById(R.id.searchBar);
         searchBar.setOnSearchActionListener(new MaterialSearchBar.OnSearchActionListener() {
@@ -75,23 +96,27 @@ public class MainActivity extends AppCompatActivity {
         });
     }
     private void searchResult (String searchText) {
+        Log.d(TAG, "START searchResult (String searchText)");
         searchBar.setPlaceHolder(searchText);
         searchBar.disableSearch();
         App.getApi().getResults(searchText).enqueue(new Callback<NazkGovResult>() {
             @Override
             public void onResponse(Call<NazkGovResult> call, Response<NazkGovResult> response) {
                 NazkGovResult nazkGovResult = response.body();
-                if (nazkGovResult != null) {
-                    String res = nazkGovResult.getItems().get(0).getFirstname();
-                    Toast.makeText(MainActivity.this, res, Toast.LENGTH_SHORT).show();
+                personList.clear();
+                if (nazkGovResult != null && nazkGovResult.getItems() != null) {
+                    personList.addAll(nazkGovResult.getItems());
+                    rVadapter.notifyDataSetChanged();
                 } else {
-                    Toast.makeText(MainActivity.this, "Nothing", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(MainActivity.this, R.string.no_results, Toast.LENGTH_SHORT).show();
                 }
+                rVadapter.notifyDataSetChanged();
             }
 
             @Override
             public void onFailure(Call<NazkGovResult> call, Throwable t) {
-                Toast.makeText(MainActivity.this, "Cannot load results", Toast.LENGTH_SHORT).show();
+                Toast.makeText(MainActivity.this, R.string.search_not_avilable, Toast.LENGTH_SHORT).show();
+                Log.d("Error",t.getMessage());
             }
         });
     }

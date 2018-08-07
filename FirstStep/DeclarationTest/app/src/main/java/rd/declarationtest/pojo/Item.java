@@ -3,7 +3,11 @@ package rd.declarationtest.pojo;
 import com.google.gson.annotations.Expose;
 import com.google.gson.annotations.SerializedName;
 
+import java.util.Objects;
+
 public class Item {
+    public static final int FAVORITE_ITEM = 111;
+    public static final int NOT_FAVORITE_ITEM = 222;
 
     @SerializedName("id")
     @Expose
@@ -23,6 +27,28 @@ public class Item {
     @SerializedName("linkPDF")
     @Expose
     private String linkPDF;
+
+    @SerializedName("comment")
+    private String comment = "";
+
+    @SerializedName("favorite")
+    private int favorite = NOT_FAVORITE_ITEM;
+
+    public String getComment() {
+        return comment;
+    }
+
+    public void setComment(String comment) {
+        this.comment = comment;
+    }
+
+    public int getFavorite() {
+        return favorite;
+    }
+
+    public void setFavorite(int favorite) {
+        this.favorite = favorite;
+    }
 
     public String getId() {
         return id;
@@ -72,4 +98,17 @@ public class Item {
         this.linkPDF = linkPDF;
     }
 
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        Item item = (Item) o;
+        return id.equals(item.id);
+    }
+
+    @Override
+    public int hashCode() {
+
+        return id.hashCode();
+    }
 }

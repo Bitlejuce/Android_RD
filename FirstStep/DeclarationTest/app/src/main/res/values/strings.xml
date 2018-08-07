@@ -11,4 +11,8 @@
     <string name="first_second_name">First Second Name</string>
     <string name="title">Державний реєстр декларацій</string>
     <string name="field_cannot_be_empty">Поле не може бути пустим!</string>
+    <string name="no_results">Немає результатів за даним запитом</string>
+    <string name="search_not_avilable">Пошук наразі не можливий</string>
+    <string name="searching">Пошук...</string>
+    <string name="notes">Notes</string>
 </resources>
