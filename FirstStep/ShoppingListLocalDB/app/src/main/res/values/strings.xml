@@ -1,0 +1,282 @@
+<resources>
+    <string name="app_name">Shopping List</string>
+
+    <string name="navigation_drawer_open">Open navigation drawer</string>
+    <string name="navigation_drawer_close">Close navigation drawer</string>
+    <string name="pic_description">pic_of_product</string>
+    <string name="admob_app_id">ca-app-pub-8462980126781299~7734683972</string>
+    <string name="admob_banner_id">ca-app-pub-8462980126781299/5410228378</string>
+
+
+    <string name="action_settings">Settings</string>
+    <string name="share">Start sharing</string>
+    <string name="rename">Rename</string>
+    <string name="delete">Delete</string>
+    <string name="add">Add</string>
+    <string name="ok_button">OK</string>
+    <string name="are_you_sure">Are you sure?</string>
+    <string name="cancel">Cancel</string>
+    <string name="clear_done">Clear done</string>
+    <string name="clear_all">Clear list</string>
+    <string name="enter_the_name_of_product">WHAT WOULD YOU LIKE?</string>
+    <string name="enter_product_name">Enter product name</string>
+    <string name="enter_quantity">Enter quantity</string>
+    <string name="available_lists">Available lists</string>
+    <string name="create_new_list">Create new list</string>
+    <string name="add_new_list">Add new list</string>
+    <string name="list_name">List name</string>
+    <string name="my_lists">My lists</string>
+    <string name="list_options">List options</string>
+    <string name="help_menu">Help</string>
+    <string name="rename_list">Rename</string>
+    <string name="rename_list_header">Rename list</string>
+    <string name="choose_list">Choose list</string>
+    <string name="shopping_list">Shopping list</string>
+    <string name="make_shopping_easier">Make shopping easier!</string>
+    <string name="delete_list">Delete list</string>
+    <string name="select_option">Select option</string>
+    <string name="logout">Log out</string>
+    <string name="login">Log in</string>
+    <string name="title_activity_login">Sign in</string>
+    <string name="back_to_list">Back to list</string>
+
+    <string name="user_exists">User already logged in</string>
+    <string name="sign_in_facebook">Sign in with Facebook</string>
+    <string name="sign_in_google">Sign in with Google</string>
+    <string name="logout_text">Sign out</string>
+
+    <!-- Strings related to login -->
+    <string name="prompt_email">Email</string>
+    <string name="prompt_password">Password (optional)</string>
+    <string name="action_sign_in">Sign in or register</string>
+    <string name="action_sign_in_short">Sign in</string>
+    <string name="error_invalid_email">This email address is invalid</string>
+    <string name="error_invalid_password">This password is too short</string>
+    <string name="error_incorrect_password">This password is incorrect</string>
+    <string name="error_field_required">This field is required</string>
+    <string name="permission_rationale">"Contacts permissions are needed for providing email
+        completions."
+    </string>
+
+    <!-- Strings related to Smartlogin -->
+    <string name="fb_login_text">Sign in with facebook</string>
+    <string name="twitter_login_text">Sign in with Twitter</string>
+    <string name="google_login_text">Sign in with Google</string>
+    <string name="or">or</string>
+
+    <!-- hints -->
+    <string name="email_hint">Email</string>
+    <string name="username_hint">Username</string>
+    <string name="username_email_hint">Username/Email</string>
+    <string name="password_hint">Password</string>
+    <string name="confirm_password_hint">Confirm Password</string>
+
+    <string name="forgot">forgot?</string>
+    <string name="sign_in">Sign in</string>
+    <string name="sign_up">No account yet? Create one</string>
+    <string name="sign_up_button">Sign up</string>
+    <string name="title_activity_main">MainActivity</string>
+    <string name="title_activity_smart_login">SmartLoginActivity</string>
+
+    <!--<string name="facebook_app_id">221623114699507</string>-->
+    <string name="config_data">config</string>
+
+    <string name="network_error">Something went wrong. Please check Network Connection.</string>
+    <string name="username_error">Please enter your username</string>
+    <string name="email_error">Please enter your email</string>
+    <string name="password_error">Please choose a password</string>
+    <string name="no_email_error">You need an email to sign up</string>
+    <string name="invalid_email_error">Please enter a valid email</string>
+
+    <string name="loading_holder">Please wait…</string>
+    <string name="logging_holder">Logging in…</string>
+    <string name="getting_data">Getting User Info…</string>
+    <string name="password_mismatch">Make sure your passwords match</string>
+    <string name="login_failed">Login failed! Try again!</string>
+
+
+    <!-- Strings related to FireBase Authentication -->
+
+    <string name="label_google_sign_in">Firebase + Google Sign In</string>
+    <string name="desc_google_sign_in">Use a Google Sign In credential to authenticate with Firebase.</string>
+
+    <string name="label_facebook_login">Firebase + Facebook Login</string>
+    <string name="desc_facebook_login">Use a Facebook Login credential to authenticate with Firebase.</string>
+
+    <string name="label_twitter_login">Firebase + Twitter Login</string>
+    <string name="desc_twitter_login">Use a Twitter Login credential to authenticate with Firebase.</string>
+
+    <string name="label_emailpassword">Email/Password Authentication</string>
+    <string name="desc_emailpassword">Use an email and password to authenticate with Firebase.</string>
+
+    <string name="label_passwordless">Passwordless Authentication</string>
+    <string name="desc_passwordless">Use only an email to authenticate with Firebase.</string>
+
+    <string name="label_phone_auth">Phone Number Authentication</string>
+    <string name="desc_phone_auth">Use a phone number to authenticate with Firebase.</string>
+
+    <string name="label_anonymous_auth">Anonymous Authentication</string>
+    <string name="desc_anonymous_auth">Sign in anonymously and then later upgrade to a full Firebase Auth user.</string>
+
+    <string name="label_custom_auth">Custom Authentication</string>
+    <string name="desc_custom_auth">Use a custom token signed by your own server to authenticate with Firebase.</string>
+
+    <string name="label_firebase_ui">FirebaseUI Auth</string>
+    <string name="desc_firebase_ui">Use the FirebaseUI-Android library to authenticate with Firebase.</string>
+
+    <string name="hint_user_id">User ID</string>
+    <string name="get_custom_token">Get Token</string>
+
+    <string name="create_account">Create Account</string>
+    <string name="send_link">Send Link</string>
+    <string name="sign_out">Sign Out</string>
+    <string name="verify_email">Verify Email</string>
+    <string name="disconnect">Disconnect</string>
+    <string name="loading">Loading…</string>
+    <string name="custom_token">Custom Token</string>
+    <string name="signed_in">Signed In</string>
+    <string name="signed_out">Signed Out</string>
+    <string name="token_null">Token: null</string>
+    <string name="hint_email">Email</string>
+    <string name="hint_password">Password</string>
+    <string name="desc_firebase_lockup">Firebase logo and name</string>
+    <string name="auth_failed">Authentication failed</string>
+    <string name="start_phone_auth">Start</string>
+    <string name="verify_phone_auth">Verify</string>
+    <string name="resend_phone_auth">Resend</string>
+    <string name="hint_phone_number">Phone Number</string>
+    <string name="hint_verification_code">Verification Code</string>
+    <string name="status_code_sent">Code Sent</string>
+    <string name="status_verification_failed">Verification failed</string>
+    <string name="status_verification_succeeded">Verification succeeded</string>
+    <string name="status_sign_in_failed">Sign-in failed</string>
+    <string name="instant_validation">(instant validation)</string>
+
+    <string name="firebase_status_fmt">Firebase User: %s</string>
+    <string name="firebase_user_management">Firebase User Management</string>
+
+    <string name="google_status_fmt">Google User: %s</string>
+    <string name="google_title_text">Google Sign In</string>
+
+    <string name="facebook_status_fmt">Facebook User: %s</string>
+    <string name="facebook_title_text">Facebook Login</string>
+
+    <string name="emailpassword_status_fmt">Email User: %1$s (verified: %2$b)</string>
+    <string name="emailpassword_title_text">Email and Password</string>
+
+    <string name="passwordless_status_fmt">Email User: %1$s (verified: %2$b)</string>
+    <string name="passwordless_title_text">Passwordless Sign In</string>
+    <string name="status_email_not_sent">Send link to your email to get started.</string>
+    <string name="status_email_sent">Link sent, check your email to continue.</string>
+    <string name="status_link_found">Link received, enter email to sign in.</string>
+
+    <string name="phone_title_text">Phone Number</string>
+
+    <string name="twitter_status_fmt">Twitter User: %s</string>
+    <string name="twitter_title_text">Twitter Login</string>
+
+    <string name="firebaseui_status_fmt">Firebase User: %s</string>
+    <string name="firebaseui_title_text">FirebaseUI Auth</string>
+
+    <string name="id_fmt">User ID: %s</string>
+    <string name="email_fmt">Email: %s</string>
+    <string name="click_to_verify">Click to verify</string>
+
+    <string name="facebook_app_id">159407041402897</string>
+    <string name="fb_login_protocol_scheme">fb159407041402897</string>
+    <string name="change_product">Change product</string>
+    <string name="new_product_name">New product name</string>
+    <string name="sort_list">Sort list</string>
+    <string name="options">Options</string>
+    <string name="sory_incorrect_key">Sorry this isn\'t correct key!</string>
+    <string name="cogratulation">Congratulation!</string>
+    <string name="secret_key">I love Shopping</string>
+    <string name="guess_the_secret_phrase">Guess the secret phrase</string>
+    <string name="remove_ads">Remove banner</string>
+    <string name="title_activity_settings">Settings</string>
+
+    <!-- Strings related to Settings -->
+
+    <!-- Example General settings -->
+    <string name="pref_header_general">General</string>
+
+    <string name="pref_title_social_recommendations">Enable social recommendations</string>
+    <string name="pref_description_social_recommendations">Recommendations for people to contact
+        based on your message history
+    </string>
+
+    <string name="pref_title_display_name">Display name</string>
+    <string name="pref_default_display_name">John Smith</string>
+
+    <string name="chose_language">Language</string>
+    <string-array name="chose_language_array_titles">
+        <item>English</item>
+        <item>Русский</item>
+    </string-array>
+    <string-array name="chose_language_array_values">
+        <item>1</item>
+        <item>0</item>
+    </string-array>
+
+    <!-- Example settings for Data & Sync -->
+    <string name="pref_header_data_sync">Data &amp; sync</string>
+
+    <string name="pref_title_sync_frequency">Sync frequency</string>
+    <string-array name="pref_sync_frequency_titles">
+        <item>15 minutes</item>
+        <item>30 minutes</item>
+        <item>1 hour</item>
+        <item>3 hours</item>
+        <item>6 hours</item>
+        <item>Never</item>
+    </string-array>
+    <string-array name="pref_sync_frequency_values">
+        <item>15</item>
+        <item>30</item>
+        <item>60</item>
+        <item>180</item>
+        <item>360</item>
+        <item>-1</item>
+    </string-array>
+
+    <string-array name="list_preference_entries">
+        <item>Entry 1</item>
+        <item>Entry 2</item>
+        <item>Entry 3</item>
+    </string-array>
+
+    <string-array name="list_preference_entry_values">
+        <item>1</item>
+        <item>2</item>
+        <item>3</item>
+    </string-array>
+
+    <string-array name="multi_select_list_preference_default_value" />
+
+    <string name="pref_title_system_sync_settings">System sync settings</string>
+
+    <!-- Example settings for Notifications -->
+    <string name="pref_header_notifications">Notifications</string>
+
+    <string name="pref_title_new_message_notifications">New message notifications</string>
+
+    <string name="pref_title_ringtone">Ringtone</string>
+    <string name="pref_ringtone_silent">Silent</string>
+
+    <string name="pref_title_vibrate">Vibrate</string>
+    <string name="choose_language_sumary">Choose you language</string>
+    <string name="pref_title_block_screen">Disable auto lock screen</string>
+    <string name="pref_log_out_on_exit">Log out on exit</string>
+    <string name="remove_ads_completely">Remove ads completely</string>
+    <string name="app_version">2.11</string>
+    <string name="title_version">Version</string>
+    <string name="contact_us">Contact</string>
+    <string name="watch_ads_video">Watch ads video</string>
+    <string name="to_remove_ads_for24">Remove banner for 24 hours</string>
+    <string name="send_email">Send email...</string>
+    <string name="banner_not_border">Congratulations banner will not border you!</string>
+    <string name="nice_try">Nice try!</string>
+    <string name="to_remove_ads_for_now">Remove banner for now</string>
+
+
+</resources>
