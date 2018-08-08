@@ -1,8 +1,8 @@
 <resources>
     <string name="app_name">DeclarationTest</string>
-    <string name="title_home">Home</string>
+    <string name="title_home">Пошук</string>
     <string name="title_dashboard">Dashboard</string>
-    <string name="title_notifications">Notifications</string>
+    <string name="title_notifications">Про додаток</string>
     <string name="position">Посада:</string>
     <string name="position_name">Position Name</string>
     <string name="patronymic">Patronymic</string>
@@ -15,4 +15,5 @@
     <string name="search_not_avilable">Пошук наразі не можливий</string>
     <string name="searching">Пошук...</string>
     <string name="notes">Notes</string>
+    <string name="title_favorites">Обрані</string>
 </resources>

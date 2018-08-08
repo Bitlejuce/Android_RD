@@ -3,6 +3,7 @@ package rd.declarationtest;
 import android.support.annotation.NonNull;
 import android.support.v7.widget.CardView;
 import android.support.v7.widget.RecyclerView;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -13,6 +14,8 @@ import java.util.List;
 
 import rd.declarationtest.pojo.Item;
 
+import static rd.declarationtest.MainActivity.TAG;
+
 public class RVadapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
     private List<Item> items;
     private MainActivity activity;
@@ -20,7 +23,7 @@ public class RVadapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
 
     public RVadapter(MainActivity activity) {
         this.activity = activity;
-        items = activity.getPersonList();
+        items = activity.getListToShow();
         favoriteList = activity.getFavoriteList();
     }
 
@@ -83,18 +86,26 @@ public class RVadapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
             pdfLink = itemView.findViewById(R.id.pdf_link_pic);
             notes = itemView.findViewById(R.id.notes);
 
-
             favoriteIcon.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
                     Item clickedItem = items.get(getAdapterPosition());
 
                     if (favoriteList.contains(clickedItem)){
+                        clickedItem.setFavorite(Item.NOT_FAVORITE_ITEM);
                         favoriteList.remove(clickedItem);
                         activity.getrVadapter().notifyDataSetChanged();
+                        activity.getDataListHandler().delete(clickedItem);
                     }else {
+                        clickedItem.setFavorite(Item.FAVORITE_ITEM);
                         favoriteList.add(clickedItem);
                         activity.getrVadapter().notifyDataSetChanged();
+                        activity.getDataListHandler().insert(clickedItem);
+                    }
+                    Log.d(TAG, " public void onClick(View v)" + clickedItem.getFirstname() +"     " + clickedItem.getFavorite());
+                    for (Item item: favoriteList){
+
+                        Log.d(TAG, "for (Item item: favoriteList)" + item.getFirstname()+"     " + item.getFavorite());
                     }
                 }
             });
@@ -107,7 +118,7 @@ public class RVadapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
             notes.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
-
+                    //TODO
                 }
             });
 

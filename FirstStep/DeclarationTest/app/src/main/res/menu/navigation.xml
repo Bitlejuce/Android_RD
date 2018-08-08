@@ -7,9 +7,9 @@
         android:title="@string/title_home" />
 
     <item
-        android:id="@+id/navigation_dashboard"
+        android:id="@+id/navigation_favorites"
         android:icon="@android:drawable/star_big_off"
-        android:title="@string/title_dashboard" />
+        android:title="@string/title_favorites" />
 
     <item
         android:id="@+id/navigation_notifications"
