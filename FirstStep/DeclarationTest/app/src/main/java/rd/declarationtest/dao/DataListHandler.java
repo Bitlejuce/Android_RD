@@ -4,14 +4,20 @@ import android.content.ContentValues;
 import android.content.Context;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
-import android.util.Log;
 
 import java.util.ArrayList;
+import java.util.List;
 
 import rd.declarationtest.pojo.Item;
 
-import static rd.declarationtest.MainActivity.TAG;
-import static rd.declarationtest.dao.DBHelper.*;
+import static rd.declarationtest.dao.DBHelper.COLUMN_COMMENT;
+import static rd.declarationtest.dao.DBHelper.COLUMN_FAVORITE;
+import static rd.declarationtest.dao.DBHelper.COLUMN_LINK_PDF;
+import static rd.declarationtest.dao.DBHelper.COLUMN_PERSON_FIRSTNAME;
+import static rd.declarationtest.dao.DBHelper.COLUMN_PERSON_ID;
+import static rd.declarationtest.dao.DBHelper.COLUMN_PERSON_LASTNAME;
+import static rd.declarationtest.dao.DBHelper.COLUMN_PERSON_PLACE_OF_WORK;
+import static rd.declarationtest.dao.DBHelper.COLUMN_PERSON_POSITION;
 
 public class DataListHandler {
     private Context context;
@@ -37,12 +43,23 @@ public class DataListHandler {
         cv.put(COLUMN_LINK_PDF, item.getLinkPDF());
         cv.put(COLUMN_COMMENT, item.getComment());
         cv.put(COLUMN_FAVORITE, item.getFavorite());
-        //Log.d(TAG, " public long insert(Item item) {" + item.getFirstname()+"     " + item.getFavorite());
         return personListDB.insert(tableName, null, cv);
     }
 
+    public void insertAll(List<Item> list) {
+        personListDB.beginTransaction();
+        try {
+            for (Item item: list){
+                insert(item);
+            }
+            personListDB.setTransactionSuccessful();
+        }
+        finally {
+            personListDB.endTransaction();
+        }
+    }
+
     public int deleteAll() {
-        //Log.d(TAG, " public void delete(Item item)  " );
         return personListDB.delete(tableName, null, null);
     }
 

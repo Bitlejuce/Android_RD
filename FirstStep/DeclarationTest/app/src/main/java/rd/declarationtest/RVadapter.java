@@ -1,9 +1,10 @@
 package rd.declarationtest;
 
+import android.content.Intent;
+import android.net.Uri;
 import android.support.annotation.NonNull;
 import android.support.v7.widget.CardView;
 import android.support.v7.widget.RecyclerView;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -13,8 +14,6 @@ import android.widget.TextView;
 import java.util.List;
 
 import rd.declarationtest.pojo.Item;
-
-import static rd.declarationtest.MainActivity.TAG;
 
 public class RVadapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
     private List<Item> items;
@@ -95,30 +94,35 @@ public class RVadapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
                         clickedItem.setFavorite(Item.NOT_FAVORITE_ITEM);
                         favoriteList.remove(clickedItem);
                         activity.getrVadapter().notifyDataSetChanged();
-                        activity.getDataListHandler().delete(clickedItem);
                     }else {
                         clickedItem.setFavorite(Item.FAVORITE_ITEM);
                         favoriteList.add(clickedItem);
                         activity.getrVadapter().notifyDataSetChanged();
-                        activity.getDataListHandler().insert(clickedItem);
-                    }
-                    Log.d(TAG, " public void onClick(View v)" + clickedItem.getFirstname() +"     " + clickedItem.getFavorite());
-                    for (Item item: favoriteList){
-
-                        Log.d(TAG, "for (Item item: favoriteList)" + item.getFirstname()+"     " + item.getFavorite());
                     }
                 }
             });
             pdfLink.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
-                    //TODO
+                    Item clickedItem = items.get(getAdapterPosition());
+                    Intent intent = new Intent();
+                    intent.setAction(Intent.ACTION_VIEW);
+                    intent.addCategory(Intent.CATEGORY_BROWSABLE);
+                    intent.setData(Uri.parse(clickedItem.getLinkPDF()));
+                    activity.startActivity(intent);
                 }
             });
             notes.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
-                    //TODO
+                    Item clickedItem = items.get(getAdapterPosition());
+                    int indexOfItemInFavoriteList = favoriteList.indexOf(clickedItem);
+                    String comment = favoriteList.get(indexOfItemInFavoriteList).getComment();
+
+                    AddCommentDialog addCommentDialog = new AddCommentDialog();
+                    addCommentDialog.setComment(comment);
+                    addCommentDialog.setItemPosition(indexOfItemInFavoriteList);
+                    addCommentDialog.show(activity.getFragmentManager(), "AddCommentDialog");
                 }
             });
 

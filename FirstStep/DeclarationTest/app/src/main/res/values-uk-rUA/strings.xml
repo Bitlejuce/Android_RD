@@ -1,0 +1,21 @@
+<resources>
+    <string name="app_name">DeclarationTest</string>
+    <string name="title_home">Пошук</string>
+    <string name="title_notifications">Про реєстр</string>
+    <string name="position">Посада:</string>
+    <string name="position_name">Position Name</string>
+    <string name="patronymic">Patronymic</string>
+    <string name="pdf">PDF</string>
+    <string name="favorites">favorites</string>
+    <string name="first_second_name">First Second Name</string>
+    <string name="title">Державний реєстр декларацій</string>
+    <string name="field_cannot_be_empty">Поле не може бути пустим!</string>
+    <string name="no_results">Немає результатів за даним запитом</string>
+    <string name="search_not_avilable">Пошук наразі не можливий, перевірте підключення до мережі</string>
+    <string name="searching">Пошук...</string>
+    <string name="title_favorites">Обрані</string>
+    <string name="add_comment">Додати коментар</string>
+    <string name="cancel">Скасувати</string>
+    <string name="add">Додати</string>
+    <string name="notes">notes</string>
+</resources>
