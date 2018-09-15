@@ -11,6 +11,8 @@ import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import com.bumptech.glide.Glide;
+
 import java.util.List;
 
 import rd.fordewindcompanytesttask.pojo.User;
@@ -40,7 +42,8 @@ public class RVadapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
         ItemViewHolder itemViewHolder = (ItemViewHolder)holder;
         User user = users.get(position);
         itemViewHolder.login.setText(user.getLogin());
-        itemViewHolder.url.setText(user.getUrl());
+        itemViewHolder.url.setText(user.getHtmlUrl());
+        Glide.with(activity).load(user.getAvatarUrl()).into(itemViewHolder.pickLink);
 
 
         //checking if current person is in the favorite list to handle favorite icon
@@ -72,19 +75,26 @@ public class RVadapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
 
         TextView login;
         TextView url;
-        //TextView positionName;
-        ImageView favoriteIcon;
         ImageView pickLink;
+
+        ImageView favoriteIcon;
         ImageView notes;
 
         public ItemViewHolder(View itemView) {
             super(itemView);
             login = itemView.findViewById(R.id.login);
-            url = itemView.findViewById(R.id.patronymic);
-            //positionName = itemView.findViewById(R.id.position_name);
+            url = itemView.findViewById(R.id.profile_link);
             favoriteIcon = itemView.findViewById(R.id.empty_star);
             pickLink = itemView.findViewById(R.id.link_pic);
             notes = itemView.findViewById(R.id.notes);
+
+            itemView.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View view) {
+                    User clickedItem = users.get(getAdapterPosition());
+                    activity.showFollowers(clickedItem.getLogin());
+                }
+            });
 
             favoriteIcon.setOnClickListener(new View.OnClickListener() {
                 @Override
@@ -106,11 +116,7 @@ public class RVadapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
                 @Override
                 public void onClick(View v) {
                     User clickedItem = users.get(getAdapterPosition());
-                    Intent intent = new Intent();
-                    intent.setAction(Intent.ACTION_VIEW);
-                    intent.addCategory(Intent.CATEGORY_BROWSABLE);
-                    intent.setData(Uri.parse(clickedItem.getFollowersUrl()));
-                    activity.startActivity(intent);
+                    activity.showFollowers(clickedItem.getLogin());
                 }
             });
             notes.setOnClickListener(new View.OnClickListener() {

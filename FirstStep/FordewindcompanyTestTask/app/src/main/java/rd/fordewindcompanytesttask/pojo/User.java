@@ -1,13 +1,8 @@
 
 package rd.fordewindcompanytesttask.pojo;
 
-import android.os.Build;
-import android.support.annotation.RequiresApi;
-
 import com.google.gson.annotations.Expose;
 import com.google.gson.annotations.SerializedName;
-
-import java.util.Objects;
 
 public class User {
 

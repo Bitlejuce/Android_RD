@@ -1,5 +1,7 @@
 package rd.fordewindcompanytesttask;
 
+import android.content.DialogInterface;
+import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 
@@ -13,6 +15,7 @@ import android.util.Log;
 import android.view.MenuItem;
 import android.view.View;
 import android.webkit.WebView;
+import android.widget.ArrayAdapter;
 import android.widget.Toast;
 
 import com.mancj.materialsearchbar.MaterialSearchBar;
@@ -30,7 +33,7 @@ import retrofit2.Response;
 public class MainActivity extends AppCompatActivity implements AddCommentDialog.OnCommentInputListener {
     public static final String TAG = "MainActivity";
     private static final String TABLE_NAME = "FAVORITES";
-    private static final String GITHUB_URL = "https://help.github.com/articles/github-terms-of-service/";
+    private static final String GITHUB_URL = "https://github.com/about";
 
     private MaterialSearchBar searchBar;
     private List<User> listToShow = new ArrayList<>();
@@ -44,9 +47,11 @@ public class MainActivity extends AppCompatActivity implements AddCommentDialog.
     public List<User> getFavoriteList() {
         return favoriteList;
     }
+
     public List<User> getListToShow() {
         return listToShow;
     }
+
     public RVadapter getrVadapter() {
         return rVadapter;
     }
@@ -60,7 +65,6 @@ public class MainActivity extends AppCompatActivity implements AddCommentDialog.
         final BottomNavigationView navigation = (BottomNavigationView) findViewById(R.id.navigation);
         navigation.setOnNavigationItemSelectedListener(mOnNavigationItemSelectedListener);
 
-        //setTitle(getString(R.string.title));
         dataListHandler = new DataListHandler(this, TABLE_NAME);
         favoriteList = dataListHandler.getFavoriteList();
         webView = findViewById(R.id.web_view);
@@ -79,14 +83,14 @@ public class MainActivity extends AppCompatActivity implements AddCommentDialog.
 
             @Override
             public void onSearchConfirmed(CharSequence text) {
-                if (text.toString().isEmpty()){
-                    Toast.makeText(MainActivity.this, R.string.field_cannot_be_empty, Toast.LENGTH_SHORT).show();
-                }else {
+
                     if (navigation.getSelectedItemId() != R.id.navigation_home) {
                         navigation.setSelectedItemId(R.id.navigation_home);
                     }
-                    searchResult(text.toString());
+                if (text.toString().isEmpty() || !isNumeric(text.toString())) {
+                    Toast.makeText(MainActivity.this, R.string.start_from_first, Toast.LENGTH_SHORT).show();
                 }
+                    searchResult(text.toString());
             }
 
             @Override
@@ -124,7 +128,7 @@ public class MainActivity extends AppCompatActivity implements AddCommentDialog.
         }
     };
 
-    private void searchResult (String searchText) {
+    private void searchResult(String searchText) {
         searchBar.setPlaceHolder(searchText);
         searchBar.disableSearch();
         App.getApi().getResults(searchText, "100").enqueue(new Callback<List<User>>() {
@@ -145,7 +149,7 @@ public class MainActivity extends AppCompatActivity implements AddCommentDialog.
             @Override
             public void onFailure(Call<List<User>> call, Throwable t) {
                 Toast.makeText(MainActivity.this, R.string.search_not_avilable, Toast.LENGTH_SHORT).show();
-                Log.d("Error",t.getMessage());
+                Log.d("Error", t.getMessage());
             }
         });
     }
@@ -173,5 +177,56 @@ public class MainActivity extends AppCompatActivity implements AddCommentDialog.
         favoriteList.get(itemPosition).setComment(input);
         rVadapter.notifyDataSetChanged();
 
+    }
+    public static boolean isNumeric(String str)
+    {
+        try
+        {
+            double d = Double.parseDouble(str);
+        }
+        catch(NumberFormatException nfe)
+        {
+            return false;
+        }
+        return true;
+    }
+
+    public void showFollowers(String login) {
+        final List<String> followersNames = new ArrayList<>();
+        final ArrayAdapter<String> adapter  =  new  ArrayAdapter<String>(
+                this, android.R.layout.simple_list_item_1, followersNames);
+        App.getApi().getFollowers(login).enqueue(new Callback<List<User>>() {
+            @Override
+            public void onResponse(Call<List<User>> call, Response<List<User>> response) {
+                List<User> userList = response.body();
+                if (userList == null || userList.isEmpty()) {
+                    followersNames.add("No followers");
+                    adapter.notifyDataSetChanged();
+                    return;
+                }else {
+                    followersNames.clear();
+                    for (User user : userList) {
+                        followersNames.add(user.getLogin());
+                        Log.d(TAG, user.getLogin());
+                    }
+                    adapter.notifyDataSetChanged();
+                }
+            }
+
+            @Override
+            public void onFailure(Call<List<User>> call, Throwable t) {
+                Toast.makeText(MainActivity.this, R.string.search_not_avilable, Toast.LENGTH_SHORT).show();
+                Log.d("Error", t.getMessage());
+            }
+        });
+
+        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        builder.setTitle(R.string.followers)
+                .setAdapter(adapter, new DialogInterface.OnClickListener() {
+                    public void onClick(DialogInterface dialog, int which) {
+                        dialog.dismiss();
+                    }
+                });
+         builder.create().show();
     }
 }

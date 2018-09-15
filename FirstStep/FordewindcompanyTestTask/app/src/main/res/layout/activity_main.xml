@@ -18,13 +18,14 @@
     <com.mancj.materialsearchbar.MaterialSearchBar
         style="@style/MaterialSearchBarLight"
         app:mt_speechMode="false"
-        app:mt_hint="@string/searching"
+        app:mt_hint="@string/input_number_of_user"
         app:mt_maxSuggestionsCount="10"
         app:mt_navIconEnabled="false"
         app:mt_roundedSearchBarEnabled="false"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:id="@+id/searchBar" />
+        android:id="@+id/searchBar"
+        android:inputType="numberDecimal"/>
 
     <android.support.v7.widget.RecyclerView
         android:id="@+id/recycler_view"

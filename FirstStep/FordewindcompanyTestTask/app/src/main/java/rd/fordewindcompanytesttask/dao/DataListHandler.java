@@ -68,13 +68,13 @@ public class DataListHandler {
         if (!mCursor.isAfterLast()) {
             do {
                 User user = new User();
-                String login = mCursor.getString(2);
-                int userID = mCursor.getInt(3);
-                String avatarURL = mCursor.getString(4);
-                String followersURL = mCursor.getString(5);
-                String htmlURL = mCursor.getString(6);
-                String comment = mCursor.getString(7);
-                int favorite = mCursor.getInt(8);
+                String login = mCursor.getString(1);
+                int userID = mCursor.getInt(2);
+                String avatarURL = mCursor.getString(3);
+                String followersURL = mCursor.getString(4);
+                String htmlURL = mCursor.getString(5);
+                String comment = mCursor.getString(6);
+                int favorite = mCursor.getInt(7);
 
                 user.setLogin(login);
                 user.setId(userID);
