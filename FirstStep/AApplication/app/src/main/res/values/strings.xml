@@ -1,0 +1,10 @@
+<resources>
+    <string name="app_name">A Application</string>
+    <string name="title_home">Home</string>
+    <string name="title_dashboard">Dashboard</string>
+    <string name="title_notifications">Notifications</string>
+    <string name="title_test">Test</string>
+    <string name="title_history">History</string>
+    <string name="input_your_link_here">Input your link here...</string>
+    <string name="ok_btn">OK</string>
+</resources>
