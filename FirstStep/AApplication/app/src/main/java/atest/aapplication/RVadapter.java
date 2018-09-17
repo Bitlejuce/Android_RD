@@ -10,8 +10,17 @@ import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
+
+import java.text.SimpleDateFormat;
+import java.util.Date;
 import java.util.List;
+import java.util.Locale;
+
 import atest.aapplication.pojo.Link;
+
+import static android.graphics.Color.GRAY;
+import static android.graphics.Color.GREEN;
+import static android.graphics.Color.RED;
 
 
 public class RVadapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
@@ -36,13 +45,24 @@ public class RVadapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
         ItemViewHolder itemViewHolder = (ItemViewHolder) holder;
         Link item = items.get(position);
         itemViewHolder.link.setText(item.getLink());
-        itemViewHolder.timeAndDate.setText(String.valueOf(item.getDateMills()));
+        itemViewHolder.timeAndDate.setText(getDate((item.getDateMills())));
 
         //checking status to set background colour
-        if (item.getStatus() == Link.STATUS_LOADED) {
-            //TODO
+        switch (item.getStatus()){
+            case Link.STATUS_LOADED: itemViewHolder.listItem.setBackgroundColor(GREEN);
+            return;
+            case Link.STATUS_ERROR: itemViewHolder.listItem.setBackgroundColor(RED);
+            return;
+            case Link.STATUS_UNKNOWN: itemViewHolder.listItem.setBackgroundColor(GRAY);
         }
     }
+
+    private String getDate(long dateMills) {
+        Date currentTime = new Date(dateMills);
+        SimpleDateFormat sdf = new SimpleDateFormat("dd-MM-yyyy HH:mm:ss", Locale.US);
+        return sdf.format(currentTime);
+    }
+
     @Override
     public int getItemCount() {
         return items.size();
@@ -52,11 +72,13 @@ public class RVadapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
 
         TextView link;
         TextView timeAndDate;
+        LinearLayout listItem;
 
         public ItemViewHolder(View itemView) {
             super(itemView);
             link = itemView.findViewById(R.id.link_textview);
             timeAndDate = itemView.findViewById(R.id.time_date_textview);
+            listItem = itemView.findViewById(R.id.list_item);
 
             itemView.setOnClickListener(new View.OnClickListener() {
                 @Override

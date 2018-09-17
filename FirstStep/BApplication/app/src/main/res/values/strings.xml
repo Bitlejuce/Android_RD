@@ -1,0 +1,5 @@
+<resources>
+    <string name="app_name">BApplication</string>
+    <string name="after_10_sec">App B is not an independent application and will be closed in 10 seconds!</string>
+    <string name="time_left">Time left:</string>
+</resources>

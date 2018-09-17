@@ -7,4 +7,6 @@
     <string name="title_history">History</string>
     <string name="input_your_link_here">Input your link here...</string>
     <string name="ok_btn">OK</string>
+    <string name="sort_by_status">Sort by Status</string>
+    <string name="sort_by_date">Sort by Date</string>
 </resources>
