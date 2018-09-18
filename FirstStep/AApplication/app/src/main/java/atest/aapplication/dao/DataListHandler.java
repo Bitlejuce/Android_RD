@@ -63,7 +63,6 @@ public class DataListHandler {
         mCursor.moveToFirst();
         if (!mCursor.isAfterLast()) {
             do {
-                //int id = mCursor.getInt(0);
                 String link = mCursor.getString(1);
                 long date = mCursor.getLong(2);
                 int status = mCursor.getInt(3);

@@ -1,12 +1,19 @@
 package atest.aapplication;
 
+import android.content.ComponentName;
+import android.content.Intent;
+import android.os.Build;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
+import android.support.annotation.RequiresApi;
 import android.support.design.widget.BottomNavigationView;
 import android.support.design.widget.TextInputLayout;
+import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
+import android.support.v7.view.menu.MenuBuilder;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
@@ -17,6 +24,8 @@ import android.widget.Toast;
 
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.Date;
 import java.util.List;
 
@@ -32,6 +41,7 @@ public class MainActivity extends AppCompatActivity {
     private List<Link> linkList;
     private DataListHandler handler;
     private RVadapter rVadapter;
+    private Menu menu;
 
     private BottomNavigationView.OnNavigationItemSelectedListener mOnNavigationItemSelectedListener
             = new BottomNavigationView.OnNavigationItemSelectedListener() {
@@ -43,12 +53,13 @@ public class MainActivity extends AppCompatActivity {
                     inputLayout.setVisibility(View.VISIBLE);
                     okButton.setVisibility(View.VISIBLE);
                     listView.setVisibility(View.INVISIBLE);
-
+                    menu.setGroupVisible(R.id.menu_group, false);
                     return true;
                 case R.id.navigation_history:
                     inputLayout.setVisibility(View.INVISIBLE);
                     okButton.setVisibility(View.INVISIBLE);
                     listView.setVisibility(View.VISIBLE);
+                    menu.setGroupVisible(R.id.menu_group, true);
                     return true;
             }
             return false;
@@ -67,7 +78,6 @@ public class MainActivity extends AppCompatActivity {
         listView.setHasFixedSize(true);
         listView.setLayoutManager(new LinearLayoutManager(this));
 
-
         BottomNavigationView navigation = (BottomNavigationView) findViewById(R.id.navigation);
         navigation.setOnNavigationItemSelectedListener(mOnNavigationItemSelectedListener);
 
@@ -79,16 +89,61 @@ public class MainActivity extends AppCompatActivity {
     }
 
     public void onButtonClicked(View view) {
-//        Date currentTime = new Date(System.currentTimeMillis());
-//        SimpleDateFormat sdf = new SimpleDateFormat("dd MM ,yyyy HH:mm:ss");
-//        //Toast.makeText(this, mTextMessage.getText().toString() + System.currentTimeMillis(), Toast.LENGTH_SHORT).show();
-//        Toast.makeText(this, mTextMessage.getText().toString() +sdf.format(currentTime), Toast.LENGTH_SHORT).show();
-            handler.insert(new Link(mTextMessage.getText().toString().trim(), System.currentTimeMillis(), Link.STATUS_LOADED));
+//            Link link = new Link(mTextMessage.getText().toString().trim(), System.currentTimeMillis(), Link.STATUS_LOADED);
+//            handler.insert(link);
+//            linkList.add(link);
+//
+//            rVadapter.notifyDataSetChanged();
 
-            rVadapter.notifyDataSetChanged();
+        Intent intent = new Intent();
+        intent.setComponent(new ComponentName("btest.bapplication", "btest.bapplication.BMainActivity"));
+        intent.putExtra("linkToPic",mTextMessage.getText().toString().trim());
+        intent.putExtra("from","button");
+        intent.putExtra("status",Link.STATUS_UNKNOWN);
+        startActivity(intent);
+    }
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        getMenuInflater().inflate(R.menu.main_screen, menu);
+        this.menu = menu;
+
+        menu.setGroupVisible(R.id.menu_group, false);
+        return true;
+    }
+
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        switch (item.getItemId()) {
+            case R.id.sort_by_date:
+                Collections.sort(linkList, new Comparator<Link>() {
+                    @Override
+                    public int compare(Link link, Link t1) {
+                        return Long.valueOf(link.getDateMills()).compareTo(t1.getDateMills());
+                    }
+                });
+                rVadapter.notifyDataSetChanged();
+                return true;
+            case R.id.sort_by_status:
+                Collections.sort(linkList, new Comparator<Link>() {
+                    @Override
+                    public int compare(Link link, Link t1) {
+                        return Integer.valueOf(link.getStatus()).compareTo(t1.getStatus());
+                    }
+                });
+                rVadapter.notifyDataSetChanged();
+                return true;
+        }
+        return super.onOptionsItemSelected(item);
     }
 
     public List<Link> getLinkList() {
         return linkList;
+    }
+
+    @Override
+    protected void onDestroy() {
+        handler.close();
+        super.onDestroy();
     }
 }
