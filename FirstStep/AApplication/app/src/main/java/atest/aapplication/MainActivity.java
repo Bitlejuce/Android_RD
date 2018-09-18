@@ -13,6 +13,7 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.view.menu.MenuBuilder;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.text.TextUtils;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -88,12 +89,19 @@ public class MainActivity extends AppCompatActivity {
 
     }
 
+    @Override
+    protected void onResume() {
+        linkList.clear();
+        linkList.addAll(handler.getSavedLinks());
+        rVadapter.notifyDataSetChanged();
+        super.onResume();
+    }
+
     public void onButtonClicked(View view) {
-//            Link link = new Link(mTextMessage.getText().toString().trim(), System.currentTimeMillis(), Link.STATUS_LOADED);
-//            handler.insert(link);
-//            linkList.add(link);
-//
-//            rVadapter.notifyDataSetChanged();
+        if (TextUtils.isEmpty(mTextMessage.getText())){
+            mTextMessage.setError("Field cannot be empty!");
+            return;
+        }
 
         Intent intent = new Intent();
         intent.setComponent(new ComponentName("btest.bapplication", "btest.bapplication.BMainActivity"));

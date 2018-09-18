@@ -14,7 +14,7 @@ public class DBHelper extends SQLiteOpenHelper {
     public static final String COLUMN_DATE = "DATE";
     public static final String COLUMN_STATUS = "STATUS";
 
-    private String tableName;
+    private String tableName = "linksList";
 
     public DBHelper(Context context) {
         super(context, DATABASE_NAME, null, DATABASE_VERSION);

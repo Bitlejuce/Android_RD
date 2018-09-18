@@ -1,5 +1,6 @@
 package atest.aapplication;
 
+import android.content.ComponentName;
 import android.content.Intent;
 import android.net.Uri;
 import android.support.annotation.NonNull;
@@ -83,7 +84,12 @@ public class RVadapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
             itemView.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
-                    //TODO
+                    Intent intent = new Intent();
+                    intent.setComponent(new ComponentName("btest.bapplication", "btest.bapplication.BMainActivity"));
+                    intent.putExtra("linkToPic", items.get(getAdapterPosition()).getLink());
+                    intent.putExtra("from","list");
+                    intent.putExtra("status",Link.STATUS_UNKNOWN);
+                    activity.startActivity(intent);
                 }
             });
 
