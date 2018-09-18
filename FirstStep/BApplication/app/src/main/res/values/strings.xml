@@ -3,4 +3,8 @@
     <string name="after_10_sec">App B is not an independent application and will be closed in 10 seconds!</string>
     <string name="time_left">Time left:</string>
     <string name="oops_cannot_load">Ooops, cannot load image</string>
+    <string name="no_sd_card">No SD card mounted!</string>
+    <string name="no_permission">No write permission</string>
+    <string name="success">Image saved with success, link deleted</string>
+    <string name="false_saving">Error during image saving</string>
 </resources>

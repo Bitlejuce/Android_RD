@@ -88,7 +88,7 @@ public class RVadapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
                     intent.setComponent(new ComponentName("btest.bapplication", "btest.bapplication.BMainActivity"));
                     intent.putExtra("linkToPic", items.get(getAdapterPosition()).getLink());
                     intent.putExtra("from","list");
-                    intent.putExtra("status",Link.STATUS_UNKNOWN);
+                    intent.putExtra("status",items.get(getAdapterPosition()).getStatus());
                     activity.startActivity(intent);
                 }
             });

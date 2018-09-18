@@ -34,7 +34,7 @@ public class DataListHandler {
         cv.put(COLUMN_STATUS, item.getStatus());
         return linkListDB.insert(tableName, null, cv);
     }
-
+    //in case we need implement new functions in app A
     public void insertAll(List<Link> list) {
         linkListDB.beginTransaction();
         try {
@@ -47,11 +47,11 @@ public class DataListHandler {
             linkListDB.endTransaction();
         }
     }
-
+    //in case we need implement new functions in app A
     public int deleteAll() {
         return linkListDB.delete(tableName, null, null);
     }
-
+    //in case we need implement new functions in app A
     public void delete(Link item) {
         linkListDB.delete(tableName, COLUMN_LINK + " = ?", new String[] { String.valueOf(item.getLink()) });
     }

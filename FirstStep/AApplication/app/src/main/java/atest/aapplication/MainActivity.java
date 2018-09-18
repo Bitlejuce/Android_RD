@@ -108,7 +108,12 @@ public class MainActivity extends AppCompatActivity {
         intent.putExtra("linkToPic",mTextMessage.getText().toString().trim());
         intent.putExtra("from","button");
         intent.putExtra("status",Link.STATUS_UNKNOWN);
-        startActivity(intent);
+
+        try {
+            startActivity(intent);
+        } catch (Exception e) {
+            Toast.makeText(MainActivity.this, R.string.you_need_abb_b, Toast.LENGTH_LONG).show();
+        }
     }
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
