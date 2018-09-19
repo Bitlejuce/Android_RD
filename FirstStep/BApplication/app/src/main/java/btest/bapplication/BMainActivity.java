@@ -11,6 +11,8 @@ import android.graphics.drawable.BitmapDrawable;
 import android.net.Uri;
 import android.os.CountDownTimer;
 import android.os.Environment;
+import android.os.Handler;
+import android.os.Looper;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.app.ActivityCompat;
@@ -98,19 +100,13 @@ public class BMainActivity extends AppCompatActivity {
                                 final String saveResult = saveImageToStorage(imageView, link);
                                 if (saveResult.equals(getString(R.string.success))) {
 
-                                    new Thread(new Runnable() {
+                                    new Handler().postDelayed(new Runnable() {
                                         @Override
                                         public void run() {
-                                            try {
-                                                Thread.sleep(15000);
-                                            }
-                                            catch (Exception e) { }
-                                            finally {
-                                                delete(link);
-                                                Toast.makeText(getApplicationContext(), saveResult, Toast.LENGTH_LONG).show();
-                                            }
+                                            delete(link);
+                                            Toast.makeText(BMainActivity.this, saveResult, Toast.LENGTH_LONG).show();
                                         }
-                                    }).start();
+                                    }, 15000);
 
                                 }else {
                                     Toast.makeText(getApplicationContext(), saveResult, Toast.LENGTH_LONG).show();
@@ -135,10 +131,7 @@ public class BMainActivity extends AppCompatActivity {
     }
 
     private String saveImageToStorage(ImageView imageView, Link link) {
-        if (!externalStoragecheck()){
-            Toast.makeText(getApplicationContext(), R.string.no_sd_card, Toast.LENGTH_LONG).show();
-            return getResources().getString(R.string.no_sd_card);
-        }
+
         if (!checkWriteExternalPermission()){
             Log.d(TAG, getResources().getString(R.string.no_permission));
 
@@ -153,7 +146,7 @@ public class BMainActivity extends AppCompatActivity {
         BitmapDrawable drawable = (BitmapDrawable) imageView.getDrawable();
         Bitmap bitmap = drawable.getBitmap();
 
-        File image = new File(dir.getAbsolutePath() + link.getDateMills() + ".png");
+        File image = new File(dir.getAbsolutePath() + File.separator + link.getDateMills() + ".png");
 
         boolean success = false;
 
@@ -220,13 +213,11 @@ public class BMainActivity extends AppCompatActivity {
 
     }
 
-    static boolean externalStoragecheck() {
-        return Environment.isExternalStorageEmulated();
-    }
     private boolean checkWriteExternalPermission()
     {
         String permission = android.Manifest.permission.WRITE_EXTERNAL_STORAGE;
         int res = checkCallingOrSelfPermission(permission);
         return (res == PackageManager.PERMISSION_GRANTED);
     }
+
 }

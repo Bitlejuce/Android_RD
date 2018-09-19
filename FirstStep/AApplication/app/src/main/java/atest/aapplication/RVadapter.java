@@ -11,6 +11,7 @@ import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import java.text.SimpleDateFormat;
 import java.util.Date;
@@ -89,7 +90,11 @@ public class RVadapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
                     intent.putExtra("linkToPic", items.get(getAdapterPosition()).getLink());
                     intent.putExtra("from","list");
                     intent.putExtra("status",items.get(getAdapterPosition()).getStatus());
-                    activity.startActivity(intent);
+                     try {
+                        activity.startActivity(intent);
+                    } catch (Exception e) {
+                        Toast.makeText(activity, R.string.you_need_abb_b, Toast.LENGTH_LONG).show();
+                    }
                 }
             });
 
