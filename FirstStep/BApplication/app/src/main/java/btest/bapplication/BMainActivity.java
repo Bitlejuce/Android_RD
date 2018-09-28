@@ -150,9 +150,8 @@ public class BMainActivity extends AppCompatActivity {
 
         boolean success = false;
 
-        FileOutputStream outStream;
-        try {
-            outStream = new FileOutputStream(image);
+
+        try (FileOutputStream outStream = new FileOutputStream(image)){
             bitmap.compress(Bitmap.CompressFormat.PNG, 100, outStream);
             outStream.flush();
             outStream.close();

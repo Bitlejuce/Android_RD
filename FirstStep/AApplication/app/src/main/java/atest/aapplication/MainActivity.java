@@ -2,8 +2,11 @@ package atest.aapplication;
 
 import android.content.ComponentName;
 import android.content.Intent;
+import android.database.ContentObserver;
+import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
+import android.os.Handler;
 import android.support.annotation.NonNull;
 import android.support.annotation.RequiresApi;
 import android.support.design.widget.BottomNavigationView;
@@ -35,6 +38,7 @@ import atest.aapplication.pojo.Link;
 
 public class MainActivity extends AppCompatActivity {
 
+    final Uri LINKS_URI = Uri.parse("content://atest.aapplication.LinksList/links");
     private EditText mTextMessage;
     private TextInputLayout inputLayout;
     private Button okButton;
@@ -86,14 +90,26 @@ public class MainActivity extends AppCompatActivity {
         linkList = handler.getSavedLinks();
         rVadapter = new RVadapter(this);
         listView.setAdapter(rVadapter);
+        getContentResolver().registerContentObserver(LINKS_URI, true, new ContentObserver(new Handler()) {
+            @Override
+            public void onChange(boolean selfChange) {
+                if (MainActivity.this.getWindow().getDecorView().getRootView().isShown()) {
+                    refreshListView();
+                }
+                super.onChange(selfChange);
+            }
+        });
+    }
 
+    private void refreshListView() {
+        linkList.clear();
+        linkList.addAll(handler.getSavedLinks());
+        rVadapter.notifyDataSetChanged();
     }
 
     @Override
     protected void onResume() {
-        linkList.clear();
-        linkList.addAll(handler.getSavedLinks());
-        rVadapter.notifyDataSetChanged();
+        refreshListView();
         super.onResume();
     }
 
