@@ -656,9 +656,10 @@ public class MainScreen extends AppCompatActivity
         }else {
             getWindow().addFlags(WindowManager.LayoutParams.FLAG_ALLOW_LOCK_WHILE_SCREEN_ON);
         }
-        String localPref = sp.getString("language_settings", "1");
+        String localPref = sp.getString("language_settings", "100");
         String localCode;
         switch (localPref){
+            case "100" : return;
             case "1" : localCode = "en";
             break;
             case "0" : localCode = "ru";
