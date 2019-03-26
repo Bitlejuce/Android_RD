@@ -2,26 +2,21 @@ package rdproject.fileloader;
 
 import android.content.ComponentName;
 import android.content.Intent;
-import android.net.Uri;
 import android.support.annotation.NonNull;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.List;
 import java.util.Locale;
 
-
 import rdproject.fileloader.pojo.Link;
 
-import static android.graphics.Color.GRAY;
 import static android.graphics.Color.GREEN;
 import static android.graphics.Color.RED;
 
@@ -55,8 +50,6 @@ public class RVadapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
             case Link.STATUS_LOADED: itemViewHolder.listItem.setBackgroundColor(GREEN);
                 return;
             case Link.STATUS_ERROR: itemViewHolder.listItem.setBackgroundColor(RED);
-                return;
-            case Link.STATUS_UNKNOWN: itemViewHolder.listItem.setBackgroundColor(GRAY);
         }
     }
 
@@ -94,7 +87,7 @@ public class RVadapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
                     try {
                         activity.startActivity(intent);
                     } catch (Exception e) {
-                        Toast.makeText(activity, R.string.you_need_abb_b, Toast.LENGTH_LONG).show();
+
                     }
                 }
             });

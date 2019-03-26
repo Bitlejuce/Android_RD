@@ -1,6 +1,6 @@
 package rdproject.fileloader.util;
 
 public interface OnSuccessListener{
-    String onSuccess();
-    String onError();
+    void onSuccess(String message);
+    void onError(String error);
 }

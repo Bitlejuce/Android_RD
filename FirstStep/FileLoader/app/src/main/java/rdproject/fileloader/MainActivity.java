@@ -1,47 +1,38 @@
 package rdproject.fileloader;
 
 
-import android.content.ComponentName;
-import android.content.Intent;
-import android.database.ContentObserver;
-import android.net.Uri;
-import android.os.Build;
+import android.Manifest;
+import android.content.pm.PackageManager;
 import android.os.Bundle;
-import android.os.Handler;
+import android.os.Environment;
 import android.support.annotation.NonNull;
-import android.support.annotation.RequiresApi;
 import android.support.design.widget.BottomNavigationView;
 import android.support.design.widget.TextInputLayout;
-import android.support.v7.app.ActionBar;
+import android.support.v4.app.ActivityCompat;
 import android.support.v7.app.AppCompatActivity;
-import android.support.v7.view.menu.MenuBuilder;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.text.TextUtils;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
-import android.widget.ListView;
-import android.widget.TextView;
 import android.widget.Toast;
 
-import java.text.SimpleDateFormat;
-import java.util.Calendar;
 import java.util.Collections;
 import java.util.Comparator;
-import java.util.Date;
 import java.util.List;
 
 import rdproject.fileloader.dao.DataListHandler;
 import rdproject.fileloader.pojo.Link;
-import rdproject.fileloader.util.FileLoaderUtility;
+import rdproject.fileloader.util.FileLoader;
 import rdproject.fileloader.util.OnSuccessListener;
 
 public class MainActivity extends AppCompatActivity {
 
-    final Uri LINKS_URI = Uri.parse("content://atest.aapplication.LinksList/links");
+
     private EditText mTextMessage;
     private TextInputLayout inputLayout;
     private Button okButton;
@@ -86,13 +77,14 @@ public class MainActivity extends AppCompatActivity {
         listView.setHasFixedSize(true);
         listView.setLayoutManager(new LinearLayoutManager(this));
 
-        BottomNavigationView navigation = (BottomNavigationView) findViewById(R.id.navigation);
+        BottomNavigationView navigation = findViewById(R.id.navigation);
         navigation.setOnNavigationItemSelectedListener(mOnNavigationItemSelectedListener);
 
         handler = new DataListHandler(this, "linksList");
         linkList = handler.getSavedLinks();
         rVadapter = new RVadapter(this);
         listView.setAdapter(rVadapter);
+        checkStoragePermission();
     }
 
     private void refreshListView() {
@@ -106,79 +98,104 @@ public class MainActivity extends AppCompatActivity {
         refreshListView();
         super.onResume();
     }
-// implement THIS!!!!!!!!!!!!!!!
+
     public void onButtonClicked(View view) {
-        if (TextUtils.isEmpty(mTextMessage.getText())){
+        if (TextUtils.isEmpty(mTextMessage.getText())) {
             mTextMessage.setError("Field cannot be empty!");
             return;
         }
-        FileLoaderUtility fileLoaderUtility = new FileLoaderUtility(getApplicationContext());
-        fileLoaderUtility.addOnEventListener(new OnSuccessListener() {
+
+        String uriToFile = mTextMessage.getText().toString().trim();
+        FileLoader fileLoader = new FileLoader();
+        fileLoader.addOnEventListener(new OnSuccessListener() {
             @Override
-            public String onSuccess() {
-                return null;
+            public void onSuccess(String message) {
+                Log.d("FileLoaderUtility", "Downloaded successfully at: " + message);
+                 Link link = new Link(message, System.currentTimeMillis(), Link.STATUS_LOADED);
+                 handler.insert(link);
+                 refreshListView();
+                Toast.makeText(MainActivity.this.getApplicationContext(),"Downloaded successfully at: " + message, Toast.LENGTH_LONG).show();
             }
 
             @Override
-            public String onError() {
-                return null;
+            public void onError(String errorMessage) {
+                Log.d("FileLoaderUtility", "Downloaded fail: " + errorMessage);
+                Link link = new Link(errorMessage, System.currentTimeMillis(), Link.STATUS_ERROR);
+                handler.insert(link);
+                refreshListView();
+                Toast.makeText(MainActivity.this.getApplicationContext(),"Download Failed: " + errorMessage, Toast.LENGTH_LONG).show();
             }
         });
 
-//        final String linkToPic = intent.getStringExtra("linkToPic");
-//        final int status = intent.getIntExtra("status", Link.STATUS_UNKNOWN);
-//        final long date = intent.getLongExtra("date", System.currentTimeMillis());
-//
-//        link = new Link(linkToPic, date, status);
-
-    }
-    @Override
-    public boolean onCreateOptionsMenu(Menu menu) {
-        getMenuInflater().inflate(R.menu.main_screen, menu);
-        this.menu = menu;
-
-        menu.setGroupVisible(R.id.menu_group, false);
-        return true;
+        checkStoragePermission();
+        fileLoader.execute(uriToFile);
     }
 
+    private void checkStoragePermission() {
+        if (Environment.getExternalStorageState().equals(Environment.MEDIA_MOUNTED)) {
+                String permission = Manifest.permission.WRITE_EXTERNAL_STORAGE;
+                int res = checkCallingOrSelfPermission(permission);
 
-    @Override
-    public boolean onOptionsItemSelected(MenuItem item) {
-        switch (item.getItemId()) {
-            case R.id.sort_by_date:
-                Collections.sort(linkList, new Comparator<Link>() {
-                    @Override
-                    public int compare(Link link, Link t1) {
-                        return Long.valueOf(link.getDateMills()).compareTo(t1.getDateMills());
-                    }
-                });
-                rVadapter.notifyDataSetChanged();
-                return true;
-            case R.id.sort_by_status:
-                Collections.sort(linkList, new Comparator<Link>() {
-                    @Override
-                    public int compare(Link link, Link t1) {
-                        return Integer.valueOf(link.getStatus()).compareTo(t1.getStatus());
-                    }
-                });
-                rVadapter.notifyDataSetChanged();
-                return true;
-            case R.id.clear_list:
-                linkList.clear();
-                rVadapter.notifyDataSetChanged();
-                handler.deleteAll();
-                return true;
+            if (!(res == PackageManager.PERMISSION_GRANTED)){
+                ActivityCompat.requestPermissions(this,
+                        new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE},
+                        1);
+            }
+        } else {
+            Toast.makeText(getApplicationContext(),
+                    "SD Card not found", Toast.LENGTH_LONG).show();
+
         }
-        return super.onOptionsItemSelected(item);
-    }
-
-    public List<Link> getLinkList() {
-        return linkList;
     }
 
     @Override
-    protected void onDestroy() {
-        handler.close();
-        super.onDestroy();
+        public boolean onCreateOptionsMenu (Menu menu){
+            getMenuInflater().inflate(R.menu.main_screen, menu);
+            this.menu = menu;
+
+            menu.setGroupVisible(R.id.menu_group, false);
+            return true;
+        }
+
+        @Override
+        public boolean onOptionsItemSelected (MenuItem item){
+            switch (item.getItemId()) {
+                case R.id.sort_by_date:
+                    Collections.sort(linkList, new Comparator<Link>() {
+                        @Override
+                        public int compare(Link link, Link t1) {
+                            return Long.valueOf(link.getDateMills()).compareTo(t1.getDateMills());
+                        }
+                    });
+                    rVadapter.notifyDataSetChanged();
+                    return true;
+                case R.id.sort_by_status:
+                    Collections.sort(linkList, new Comparator<Link>() {
+                        @Override
+                        public int compare(Link link, Link t1) {
+                            return Integer.valueOf(link.getStatus()).compareTo(t1.getStatus());
+                        }
+                    });
+                    rVadapter.notifyDataSetChanged();
+                    return true;
+                case R.id.clear_list:
+                    linkList.clear();
+                    rVadapter.notifyDataSetChanged();
+                    handler.deleteAll();
+                    return true;
+            }
+            return super.onOptionsItemSelected(item);
+        }
+
+        public List<Link> getLinkList () {
+            return linkList;
+        }
+
+        @Override
+        protected void onDestroy () {
+            handler.close();
+            super.onDestroy();
+        }
+
     }
-}
+
